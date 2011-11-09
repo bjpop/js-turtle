@@ -1,0 +1,42 @@
+body,
+html {
+   margin:0;
+   padding:0;
+}
+
+body h1 {
+   text-align:center;
+}
+
+#wrap {
+   width:1000px;
+   margin:0 auto;
+}
+
+#leftcolumn {
+   float:left;
+   width:30%;
+}
+
+#midcolumn {
+   float:left;
+   width:35%;
+}
+
+#rightcolumn {
+   float:right;
+   width:35%;
+}
+
+#turtlecanvas {
+   background:#fff;
+   border: 1px solid red;
+}
+
+#definitions {
+   width:300px;
+}
+
+#command {
+   width:300px;
+}
