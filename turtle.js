@@ -302,12 +302,23 @@ function setFont(font) {
 $('#command').change(function () {
    var commandText = $(this).val();
    var definitionsText = $('#definitions').val();
-   // execute any code in the definitions box
-   eval(definitionsText);
-   // execute the code in the command box
-   eval(commandText);
-   // clear the command box
-   $(this).val('');
+   try {
+     // execute any code in the definitions box
+     eval(definitionsText);
+     // execute the code in the command box
+     eval(commandText);
+   } catch(e) {
+     alert('Exception thrown, please see console');
+     throw e;
+   } finally {
+     // clear the command box
+     $(this).val('');
+   }
 });
+
+$('#resetButton').click(function() {
+  reset();
+});
+
 
 reset();
