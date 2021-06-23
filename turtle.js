@@ -11,6 +11,26 @@ var turtleContext = turtleCanvas.getContext('2d');
 // the turtle takes precedence when compositing
 turtleContext.globalCompositeOperation = 'destination-over';
 
+// specification of relative coordinates for drawing turtle shapes,
+// as lists of [x,y] pairs
+// (The shapes are borrowed from cpython turtle.py)
+var shapes = {
+    "triangle" : [[-5, 0], [5, 0], [0, 15]],
+    "turtle": [[0, 16], [-2, 14], [-1, 10], [-4, 7], [-7, 9],
+               [-9, 8], [-6, 5], [-7, 1], [-5, -3], [-8, -6],
+               [-6, -8], [-4, -5], [0, -7], [4, -5], [6, -8],
+               [8, -6], [5, -3], [7, 1], [6, 5], [9, 8],
+               [7, 9], [4, 7], [1, 10], [2, 14]],
+    "square": [[10, -10], [10, 10], [-10, 10], [-10, -10]],
+    "circle": [[10, 0], [9.51, 3.09], [8.09, 5.88],
+               [5.88, 8.09], [3.09, 9.51], [0, 10],
+               [-3.09, 9.51], [-5.88, 8.09], [-8.09, 5.88],
+               [-9.51, 3.09], [-10, 0], [-9.51, -3.09],
+               [-8.09, -5.88], [-5.88, -8.09], [-3.09, -9.51],
+               [-0.00, -10.00], [3.09, -9.51], [5.88, -8.09],
+               [8.09, -5.88], [9.51, -3.09]]
+};
+
 // initialise the state of the turtle
 var turtle = undefined;
 
@@ -26,6 +46,7 @@ function initialise() {
         visible: true,
         redraw: true, // does this belong here?
         wrap: true,
+        shape: "triangle",
         colour: {
             r: 0,
             g: 0,
@@ -70,10 +91,18 @@ function draw() {
         // move the turtle back to its position
         turtleContext.translate(-x, -y);
         // draw the turtle icon
+        let icon = shapes.hasOwnProperty(turtle.shape) ?
+            turtle.shape : "triangle";
         turtleContext.beginPath();
-        turtleContext.moveTo(x - w / 2, y);
-        turtleContext.lineTo(x + w / 2, y);
-        turtleContext.lineTo(x, y + h);
+        for (let i=0; i<shapes[icon].length; i++) {
+            let coord = shapes[icon][i];
+            if (i==0) {
+                turtleContext.moveTo(x+coord[0], y+coord[1]);
+            }
+            else {
+                turtleContext.lineTo(x+coord[0], y+coord[1]);
+            }
+        }
         turtleContext.closePath();
         turtleContext.fillStyle = "green";
         turtleContext.fill();
@@ -259,6 +288,13 @@ function write(msg) {
     imageContext.fillText(msg, turtle.pos.x, turtle.pos.y);
     imageContext.restore();
     drawIf();
+}
+
+// set the turtle draw shape, currently supports
+// triangle (default), circle, square and turtle
+function shape(s) {
+    turtle.shape = s;
+    draw();
 }
 
 // set the colour of the line using RGB values in the range 0 - 255.
