@@ -1,11 +1,11 @@
 // get a handle for the canvases in the document
-var imageCanvas = $('#imagecanvas')[0];
+var imageCanvas = document.querySelector('#imagecanvas');
 var imageContext = imageCanvas.getContext('2d');
 
 imageContext.textAlign = "center";
 imageContext.textBaseline = "middle";
 
-var turtleCanvas = $('#turtlecanvas')[0];
+var turtleCanvas = document.querySelector('#turtlecanvas');
 var turtleContext = turtleCanvas.getContext('2d');
 
 // the turtle takes precedence when compositing
@@ -348,10 +348,10 @@ document.getElementById("command").addEventListener("keydown", (e) => {
 
 // Execute the program when the command box is changed
 // (when the user presses enter)
-$('#command').change(function() {
-    var commandText = $(this).val();
+document.querySelector('#command').addEventListener('change', function() {
+    var commandText = this.value;
     commandList.push(commandText);
-    var definitionsText = $('#definitions').val();
+    var definitionsText = document.querySelector('#definitions').value;
     try {
         // execute any code in the definitions box
         eval(definitionsText);
@@ -362,11 +362,11 @@ $('#command').change(function() {
         throw e;
     } finally {
         // clear the command box
-        $(this).val('');
+        this.value = '';
     }
 });
 
-$('#resetButton').click(function() {
+document.querySelector('#resetButton').addEventListener('click', function() {
     reset();
 });
 
