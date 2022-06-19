@@ -5,7 +5,7 @@ function halfSierpinski(size, level) {
        function part() {
           halfSierpinski(size, level - 1);
           left(45);
-          forward(size * Math.sqrt(2));
+          forward(size * Math.SQRT2);
           left(45);
           halfSierpinski(size, level - 1);
        }
