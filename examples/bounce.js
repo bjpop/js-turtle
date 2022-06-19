@@ -1,6 +1,6 @@
 // rectagles which bounce off the side of the canvas
 function init_drops(n) {
-   var drops = Array(n);
+   var drops = [];
    for (var i = 0; i < n; i++) {
       var x = random(-150, 150);
       var y = random(-150, 150);
