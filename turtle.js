@@ -1,12 +1,12 @@
 // get a handle for the canvases in the document
-var imageCanvas = document.getElementById('imagecanvas');
-var imageContext = imageCanvas.getContext('2d');
+const imageCanvas = document.getElementById('imagecanvas');
+const imageContext = imageCanvas.getContext('2d');
 
 imageContext.textAlign = "center";
 imageContext.textBaseline = "middle";
 
-var turtleCanvas = document.getElementById('turtlecanvas');
-var turtleContext = turtleCanvas.getContext('2d');
+const turtleCanvas = document.getElementById('turtlecanvas');
+const turtleContext = turtleCanvas.getContext('2d');
 
 // the turtle takes precedence when compositing
 turtleContext.globalCompositeOperation = 'destination-over';
@@ -14,7 +14,7 @@ turtleContext.globalCompositeOperation = 'destination-over';
 // specification of relative coordinates for drawing turtle shapes,
 // as lists of [x,y] pairs
 // (The shapes are borrowed from cpython turtle.py)
-var shapes = {
+const shapes = {
     "triangle" : [[-5, 0], [5, 0], [0, 15]],
     "turtle": [[0, 16], [-2, 14], [-1, 10], [-4, 7], [-7, 9],
                [-9, 8], [-6, 5], [-7, 1], [-5, -3], [-8, -6],
@@ -32,7 +32,7 @@ var shapes = {
 };
 
 // initialise the state of the turtle
-var turtle = undefined;
+let turtle = undefined;
 
 function initialise() {
     turtle = {
@@ -309,7 +309,7 @@ function random(low, hi) {
 }
 
 function repeat(n, action) {
-    for (var count = 1; count <= n; count++)
+    for (let count = 1; count <= n; count++)
         action();
 }
 
@@ -326,10 +326,11 @@ function setFont(font) {
 //////////////////
 
 // Navigate command history
-var commandList = [];
-var currentCommand = 0;
+const commandList = [];
+let currentCommand = 0;
+let commandListSize = 0; // measured in code-units, not bytes
 
-var cli = document.getElementById('command');
+const cli = document.getElementById('command');
 
 // Moves up and down in command history
 cli.addEventListener("keydown", function(e) {
@@ -340,7 +341,8 @@ cli.addEventListener("keydown", function(e) {
     } else if (e.key == "ArrowDown") {
         currentCommand++;
         if (currentCommand > commandList.length) currentCommand = commandList.length;
-        var command = commandList[currentCommand] == undefined ? "" : commandList[currentCommand];
+        const command = commandList[currentCommand] == undefined ?
+            "" : commandList[currentCommand];
         cli.value = command;
     }
 }, false);
@@ -348,8 +350,18 @@ cli.addEventListener("keydown", function(e) {
 // Execute the program when the command box is changed
 // (when the user presses enter)
 cli.addEventListener('change', function() {
+    // max CUs to store until a cmd is cleared from history queue
+    const CMD_SIZE_LIMIT = 1 << 16;
+
     const commandText = this.value;
     commandList.push(commandText);
+    commandListSize += commandText.length;
+    // reduce memory use if user has been here for a long time
+    if (commandListSize > CMD_SIZE_LIMIT) {
+        // dequeue and update size
+        commandListSize -= commandList.shift().length;
+        currentCommand--; // index correction
+    }
     const definitionsText = document.getElementById('definitions').value;
     try {
         // execute any code in the definitions box
