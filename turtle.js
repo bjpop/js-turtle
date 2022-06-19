@@ -296,7 +296,7 @@ function shape(s) {
 }
 
 // set the colour of the line using RGB values in the range 0 - 255.
-function colour(r, g, b, a) {
+function colour(r, g, b, a) { // should this have a `color` alias?
     imageContext.strokeStyle = "rgba(" + r + "," + g + "," + b + "," + a + ")";
     turtle.colour.r = r;
     turtle.colour.g = g;
@@ -304,8 +304,8 @@ function colour(r, g, b, a) {
     turtle.colour.a = a;
 }
 
-// https://docs.python.org/3/library/random.html#random.randint
-function randint(low, hi) {
+// equivalent to: https://docs.python.org/3/library/random.html#random.randint
+function random(low, hi) {
     return Math.floor(Math.random() * (hi - low + 1) + low);
 }
 
