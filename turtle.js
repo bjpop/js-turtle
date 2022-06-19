@@ -1,11 +1,11 @@
 // get a handle for the canvases in the document
-var imageCanvas = document.querySelector('#imagecanvas');
+var imageCanvas = document.getElementById('imagecanvas');
 var imageContext = imageCanvas.getContext('2d');
 
 imageContext.textAlign = "center";
 imageContext.textBaseline = "middle";
 
-var turtleCanvas = document.querySelector('#turtlecanvas');
+var turtleCanvas = document.getElementById('turtlecanvas');
 var turtleContext = turtleCanvas.getContext('2d');
 
 // the turtle takes precedence when compositing
@@ -67,8 +67,8 @@ function drawIf() {
 
 // use canvas centered coordinates facing upwards
 function centerCoords(context) {
-    var width = context.canvas.width;
-    var height = context.canvas.height;
+    let width = context.canvas.width;
+    let height = context.canvas.height;
     context.translate(width / 2, height / 2);
     context.transform(1, 0, 0, -1, 0, 0);
 }
@@ -77,10 +77,8 @@ function centerCoords(context) {
 function draw() {
     clearContext(turtleContext);
     if (turtle.visible) {
-        var x = turtle.pos.x;
-        var y = turtle.pos.y;
-        var w = 10;
-        var h = 15;
+        let x = turtle.pos.x;
+        let y = turtle.pos.y;
         turtleContext.save();
         // use canvas centered coordinates facing upwards
         centerCoords(turtleContext);
@@ -139,25 +137,25 @@ function forward(distance) {
     centerCoords(imageContext);
     imageContext.beginPath();
     // get the boundaries of the canvas
-    var maxX = imageContext.canvas.width / 2;
-    var minX = -imageContext.canvas.width / 2;
-    var maxY = imageContext.canvas.height / 2;
-    var minY = -imageContext.canvas.height / 2;
-    var x = turtle.pos.x;
-    var y = turtle.pos.y;
+    let maxX = imageContext.canvas.width / 2;
+    let minX = -imageContext.canvas.width / 2;
+    let maxY = imageContext.canvas.height / 2;
+    let minY = -imageContext.canvas.height / 2;
+    let x = turtle.pos.x;
+    let y = turtle.pos.y;
     // trace out the forward steps
     while (distance > 0) {
         // move the to current location of the turtle
         imageContext.moveTo(x, y);
         // calculate the new location of the turtle after doing the forward movement
-        var cosAngle = Math.cos(turtle.angle);
-        var sinAngle = Math.sin(turtle.angle)
-        var newX = x + sinAngle * distance;
-        var newY = y + cosAngle * distance;
+        let cosAngle = Math.cos(turtle.angle);
+        let sinAngle = Math.sin(turtle.angle);
+        let newX = x + sinAngle * distance;
+        let newY = y + cosAngle * distance;
         // wrap on the X boundary
         function xWrap(cutBound, otherBound) {
-            var distanceToEdge = Math.abs((cutBound - x) / sinAngle);
-            var edgeY = cosAngle * distanceToEdge + y;
+            let distanceToEdge = Math.abs((cutBound - x) / sinAngle);
+            let edgeY = cosAngle * distanceToEdge + y;
             imageContext.lineTo(cutBound, edgeY);
             distance -= distanceToEdge;
             x = otherBound;
@@ -306,8 +304,8 @@ function colour(r, g, b, a) {
     turtle.colour.a = a;
 }
 
-// Generate a random integer between low and hi
-function random(low, hi) {
+// https://docs.python.org/3/library/random.html#random.randint
+function randint(low, hi) {
     return Math.floor(Math.random() * (hi - low + 1) + low);
 }
 
@@ -332,26 +330,28 @@ function setFont(font) {
 var commandList = [];
 var currentCommand = 0;
 
+var cli = document.getElementById('command');
+
 // Moves up and down in command history
-document.getElementById("command").addEventListener("keydown", (e) => {
+cli.addEventListener("keydown", function(e) {
     if (e.key == "ArrowUp") {
         currentCommand--;
         if (currentCommand < 0) currentCommand = 0;
-        document.getElementById("command").value = commandList[currentCommand];
+        cli.value = commandList[currentCommand];
     } else if (e.key == "ArrowDown") {
         currentCommand++;
         if (currentCommand > commandList.length) currentCommand = commandList.length;
         var command = commandList[currentCommand] == undefined ? "" : commandList[currentCommand];
-        document.getElementById("command").value = command;
+        cli.value = command;
     }
 }, false);
 
 // Execute the program when the command box is changed
 // (when the user presses enter)
-document.querySelector('#command').addEventListener('change', function() {
-    var commandText = this.value;
+cli.addEventListener('change', function() {
+    let commandText = this.value;
     commandList.push(commandText);
-    var definitionsText = document.querySelector('#definitions').value;
+    let definitionsText = document.getElementById('definitions').value;
     try {
         // execute any code in the definitions box
         eval(definitionsText);
@@ -366,8 +366,8 @@ document.querySelector('#command').addEventListener('change', function() {
     }
 });
 
-document.querySelector('#resetButton').addEventListener('click', function() {
-    reset();
+document.getElementById('resetButton').addEventListener('click', function() {
+    reset(); // for some reason, this only works when wrapped, not when called directly
 });
 
 reset();
