@@ -67,8 +67,8 @@ function drawIf() {
 
 // use canvas centered coordinates facing upwards
 function centerCoords(context) {
-    let width = context.canvas.width;
-    let height = context.canvas.height;
+    const width = context.canvas.width;
+    const height = context.canvas.height;
     context.translate(width / 2, height / 2);
     context.transform(1, 0, 0, -1, 0, 0);
 }
@@ -77,8 +77,8 @@ function centerCoords(context) {
 function draw() {
     clearContext(turtleContext);
     if (turtle.visible) {
-        let x = turtle.pos.x;
-        let y = turtle.pos.y;
+        const x = turtle.pos.x;
+        const y = turtle.pos.y;
         turtleContext.save();
         // use canvas centered coordinates facing upwards
         centerCoords(turtleContext);
@@ -89,11 +89,11 @@ function draw() {
         // move the turtle back to its position
         turtleContext.translate(-x, -y);
         // draw the turtle icon
-        let icon = shapes.hasOwnProperty(turtle.shape) ?
+        const icon = shapes.hasOwnProperty(turtle.shape) ?
             turtle.shape : "triangle";
         turtleContext.beginPath();
-        for (let i=0; i<shapes[icon].length; i++) {
-            let coord = shapes[icon][i];
+        for (let i=0; i < shapes[icon].length; i++) {
+            var coord = shapes[icon][i]; // `var`instead of `const`, for IE11
             if (i==0) {
                 turtleContext.moveTo(x+coord[0], y+coord[1]);
             }
@@ -136,11 +136,10 @@ function forward(distance) {
     imageContext.save();
     centerCoords(imageContext);
     imageContext.beginPath();
+    const canv = imageContext.canvas;
     // get the boundaries of the canvas
-    let maxX = imageContext.canvas.width / 2;
-    let minX = -imageContext.canvas.width / 2;
-    let maxY = imageContext.canvas.height / 2;
-    let minY = -imageContext.canvas.height / 2;
+    const maxX = canv.width / 2, minX = -maxX;
+    const maxY = canv.height / 2, minY = -maxY;
     let x = turtle.pos.x;
     let y = turtle.pos.y;
     // trace out the forward steps
@@ -148,14 +147,14 @@ function forward(distance) {
         // move the to current location of the turtle
         imageContext.moveTo(x, y);
         // calculate the new location of the turtle after doing the forward movement
-        let cosAngle = Math.cos(turtle.angle);
-        let sinAngle = Math.sin(turtle.angle);
-        let newX = x + sinAngle * distance;
-        let newY = y + cosAngle * distance;
+        const cosAngle = Math.cos(turtle.angle);
+        const sinAngle = Math.sin(turtle.angle);
+        const newX = x + sinAngle * distance;
+        const newY = y + cosAngle * distance;
         // wrap on the X boundary
         function xWrap(cutBound, otherBound) {
-            let distanceToEdge = Math.abs((cutBound - x) / sinAngle);
-            let edgeY = cosAngle * distanceToEdge + y;
+            const distanceToEdge = Math.abs((cutBound - x) / sinAngle);
+            const edgeY = cosAngle * distanceToEdge + y;
             imageContext.lineTo(cutBound, edgeY);
             distance -= distanceToEdge;
             x = otherBound;
@@ -163,8 +162,8 @@ function forward(distance) {
         }
         // wrap on the Y boundary
         function yWrap(cutBound, otherBound) {
-            var distanceToEdge = Math.abs((cutBound - y) / cosAngle);
-            var edgeX = sinAngle * distanceToEdge + x;
+            const distanceToEdge = Math.abs((cutBound - y) / cosAngle);
+            const edgeX = sinAngle * distanceToEdge + x;
             imageContext.lineTo(edgeX, cutBound);
             distance -= distanceToEdge;
             x = edgeX;
@@ -349,9 +348,9 @@ cli.addEventListener("keydown", function(e) {
 // Execute the program when the command box is changed
 // (when the user presses enter)
 cli.addEventListener('change', function() {
-    let commandText = this.value;
+    const commandText = this.value;
     commandList.push(commandText);
-    let definitionsText = document.getElementById('definitions').value;
+    const definitionsText = document.getElementById('definitions').value;
     try {
         // execute any code in the definitions box
         eval(definitionsText);
