@@ -93,7 +93,7 @@ function draw() {
             turtle.shape : "triangle";
         turtleContext.beginPath();
         for (let i=0; i < shapes[icon].length; i++) {
-            var coord = shapes[icon][i]; // `var`instead of `const`, for IE11
+            const coord = shapes[icon][i];
             if (i==0) {
                 turtleContext.moveTo(x+coord[0], y+coord[1]);
             }
