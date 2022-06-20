@@ -1,3 +1,4 @@
+'use strict';
 // get a handle for the canvases in the document
 const imageCanvas = document.getElementById('imagecanvas');
 const imageContext = imageCanvas.getContext('2d');
@@ -32,7 +33,7 @@ const shapes = {
 };
 
 // initialise the state of the turtle
-let turtle = undefined;
+let turtle = null;
 
 function initialise() {
     turtle = {
@@ -67,9 +68,7 @@ function drawIf() {
 
 // use canvas centered coordinates facing upwards
 function centerCoords(context) {
-    const width = context.canvas.width;
-    const height = context.canvas.height;
-    context.translate(width / 2, height / 2);
+    context.translate(context.canvas.width / 2, context.canvas.height / 2);
     context.transform(1, 0, 0, -1, 0, 0);
 }
 
@@ -152,7 +151,7 @@ function forward(distance) {
         const newX = x + sinAngle * distance;
         const newY = y + cosAngle * distance;
         // wrap on the X boundary
-        function xWrap(cutBound, otherBound) {
+        const xWrap = function(cutBound, otherBound) {
             const distanceToEdge = Math.abs((cutBound - x) / sinAngle);
             const edgeY = cosAngle * distanceToEdge + y;
             imageContext.lineTo(cutBound, edgeY);
@@ -161,7 +160,7 @@ function forward(distance) {
             y = edgeY;
         }
         // wrap on the Y boundary
-        function yWrap(cutBound, otherBound) {
+        const yWrap = function(cutBound, otherBound) {
             const distanceToEdge = Math.abs((cutBound - y) / cosAngle);
             const edgeX = sinAngle * distanceToEdge + x;
             imageContext.lineTo(edgeX, cutBound);
@@ -170,7 +169,7 @@ function forward(distance) {
             y = otherBound;
         }
         // don't wrap the turtle on any boundary
-        function noWrap() {
+        const noWrap = function() {
             imageContext.lineTo(newX, newY);
             turtle.pos.x = newX;
             turtle.pos.y = newY;
@@ -282,6 +281,7 @@ function write(msg) {
     imageContext.translate(turtle.pos.x, turtle.pos.y);
     imageContext.transform(1, 0, 0, -1, 0, 0);
     imageContext.translate(-turtle.pos.x, -turtle.pos.y);
+    imageContext.rotate(turtle.angle);
     imageContext.fillText(msg, turtle.pos.x, turtle.pos.y);
     imageContext.restore();
     drawIf();
@@ -326,59 +326,71 @@ function setFont(font) {
 //////////////////
 
 // Navigate command history
-const commandList = [];
-let currentCommand = 0;
-let commandListSize = 0; // measured in code-units, not bytes
+const commandHist = [];
+let commandIndex = 0;
+let commandHistSize = 0; // measured in code-units, not bytes
 
-const cli = document.getElementById('command');
+// append command to history
+const histQueue = function(cmdTxt) {
+    // queue and set index to newest entry
+    commandIndex = commandHist.push(cmdTxt);
+    commandHistSize += cmdTxt.length;
+}
+// removes old entries until memory use is lower
+// essentially, manual hi-level garbage collection
+const histFlush = function() {
+    // max CUs to store until a cmd is cleared from history queue
+    const HIST_SIZE_LIMIT = 1 << 20;
+    while (commandHistSize > HIST_SIZE_LIMIT) {
+        // dequeue, then update size
+        commandHistSize -= commandHist.shift().length;
+        commandIndex--; // index correction
+    }
+}
+
+const cmdBox = document.getElementById('command');
 
 // Moves up and down in command history
-cli.addEventListener("keydown", function(e) {
+cmdBox.addEventListener("keydown", function(e) {
     if (e.key == "ArrowUp") {
-        currentCommand--;
-        if (currentCommand < 0) currentCommand = 0;
-        cli.value = commandList[currentCommand];
-    } else if (e.key == "ArrowDown") {
-        currentCommand++;
-        if (currentCommand > commandList.length) currentCommand = commandList.length;
-        const command = commandList[currentCommand] == undefined ?
-            "" : commandList[currentCommand];
-        cli.value = command;
+        if (--commandIndex < 0)
+            commandIndex = 0;
+        cmdBox.value = commandHist[commandIndex] || "";
+    }
+    if (e.key == "ArrowDown") {
+        if (++commandIndex > commandHist.length)
+            commandIndex = commandHist.length;
+        cmdBox.value = commandHist[commandIndex] || "";
     }
 }, false);
 
-// Execute the program when the command box is changed
-// (when the user presses enter)
-cli.addEventListener('change', function() {
-    // max CUs to store until a cmd is cleared from history queue
-    const CMD_SIZE_LIMIT = 1 << 20;
-
-    const commandText = this.value;
-    commandList.push(commandText);
-    commandListSize += commandText.length;
-    // reduce memory use if user has been here for a long time
-    while (commandListSize > CMD_SIZE_LIMIT) {
-        // dequeue and update size
-        commandListSize -= commandList.shift().length;
-        currentCommand--; // index correction
-    }
+const runCommand = function() {
+    const commandText = cmdBox.value;
+    histQueue(commandText);
+    histFlush();
     const definitionsText = document.getElementById('definitions').value;
+    // https://stackoverflow.com/questions/19357978/indirect-eval-call-in-strict-mode
+    // JS never ceases to surprise me
     try {
         // execute any code in the definitions box
-        eval(definitionsText);
+        (0, eval)(definitionsText);
         // execute the code in the command box
-        eval(commandText);
+        (0, eval)(commandText);
     } catch (e) {
         alert('Exception thrown:\n' + e);
         throw e;
     } finally {
         // clear the command box
-        this.value = '';
+        cmdBox.value = '';
     }
+}
+
+// Execute the program in the command box when the user presses "Run" button or "Enter" key
+document.getElementById('runButton').addEventListener('click', runCommand);
+cmdBox.addEventListener('keydown', function(e) {
+    if (e.key == "Enter") runCommand();
 });
 
-document.getElementById('resetButton').addEventListener('click', function() {
-    reset(); // for some reason, this only works when wrapped, not when called directly
-});
+document.getElementById('resetButton').addEventListener('click', reset);
 
 reset();
