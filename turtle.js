@@ -351,7 +351,7 @@ cli.addEventListener("keydown", function(e) {
 // (when the user presses enter)
 cli.addEventListener('change', function() {
     // max CUs to store until a cmd is cleared from history queue
-    const CMD_SIZE_LIMIT = 1 << 16;
+    const CMD_SIZE_LIMIT = 1 << 20;
 
     const commandText = this.value;
     commandList.push(commandText);
