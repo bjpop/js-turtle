@@ -40,6 +40,6 @@ function rain (drops) {
 function demo (n) {
    wrap(false);
    hideTurtle();
-   drops = init_drops(n);
+   var drops = init_drops(n);
    animate(function() { rain(drops) }, 100);
 }
