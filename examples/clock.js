@@ -29,7 +29,7 @@ function circle(x, y, w, radius, sides) {
    pendown();
    colour(0, 255, 0, 0.5);
    width(w);
-   for(var n = 0; n < sides; n++) {
+   for (var n = 0; n < sides; n++) {
       forward(sideLen);
       right(theta);
    }
