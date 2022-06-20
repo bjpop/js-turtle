@@ -276,13 +276,15 @@ function width(w) {
 // the turtle orientation, but this will require some clever
 // canvas transformations which aren't implemented yet.
 function write(msg) {
+    const x = turtle.pos.x;
+    const y = turtle.pos.y;
     imageContext.save();
     centerCoords(imageContext);
-    imageContext.translate(turtle.pos.x, turtle.pos.y);
+    //imageContext.rotate(turtle.angle);
+    imageContext.translate(x, y);
     imageContext.transform(1, 0, 0, -1, 0, 0);
-    imageContext.translate(-turtle.pos.x, -turtle.pos.y);
-    imageContext.rotate(turtle.angle);
-    imageContext.fillText(msg, turtle.pos.x, turtle.pos.y);
+    imageContext.translate(-x, -y);
+    imageContext.fillText(msg, x, y);
     imageContext.restore();
     drawIf();
 }
