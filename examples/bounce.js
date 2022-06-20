@@ -27,12 +27,10 @@ function rain (drops) {
       colour(d.r,d.g,d.b,d.a);
       width(d.width);
       goto(d.x, d.y);
-      if (d.y < -150 || d.y + d.size > 150 && d.velocityY > 0) {
+      if (d.y < -150 || d.y + d.size > 150 && d.velocityY > 0)
          d.velocityY *= -1;
-      }
-      if (d.x - d.width/2 < -150 || d.x + d.width/2 > 150) {
+      if (d.x - d.width/2 < -150 || d.x + d.width/2 > 150)
          d.velocityX *= -1;
-      }
       forward(d.size);
       d.y += d.velocityY;
       d.x += d.velocityX;
