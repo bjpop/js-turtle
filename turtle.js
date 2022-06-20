@@ -331,7 +331,7 @@ let commandIndex = 0;
 let commandHistSize = 0; // measured in code-units, not bytes
 
 // append command to history
-const histQueue = function(cmdTxt) {
+const histAdd = function(cmdTxt) {
     // queue and set index to newest entry
     commandIndex = commandHist.push(cmdTxt);
     commandHistSize += cmdTxt.length;
@@ -366,7 +366,7 @@ cmdBox.addEventListener("keydown", function(e) {
 
 const runCommand = function() {
     const commandText = cmdBox.value;
-    histQueue(commandText);
+    histAdd(commandText);
     histFlush();
     const definitionsText = document.getElementById('definitions').value;
     // https://stackoverflow.com/questions/19357978/indirect-eval-call-in-strict-mode
