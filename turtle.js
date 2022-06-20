@@ -357,7 +357,7 @@ cli.addEventListener('change', function() {
     commandList.push(commandText);
     commandListSize += commandText.length;
     // reduce memory use if user has been here for a long time
-    if (commandListSize > CMD_SIZE_LIMIT) {
+    while (commandListSize > CMD_SIZE_LIMIT) {
         // dequeue and update size
         commandListSize -= commandList.shift().length;
         currentCommand--; // index correction
