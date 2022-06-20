@@ -1,19 +1,19 @@
 function halfSierpinski(size, level) {
-    if (level == 0)
-       forward(size);
-    else {
-       function part() {
-          halfSierpinski(size, level - 1);
-          left(45);
-          forward(size * Math.SQRT2);
-          left(45);
-          halfSierpinski(size, level - 1);
-       }
-       part();
-       right(90);
-       forward(size);
-       right(90);
-       part();
+   if (level == 0)
+      forward(size);
+   else {
+      function part() {
+         halfSierpinski(size, level - 1);
+         left(45);
+         forward(size * Math.SQRT2);
+         left(45);
+         halfSierpinski(size, level - 1);
+      }
+      part();
+      right(90);
+      forward(size);
+      right(90);
+      part();
    }
 }
 

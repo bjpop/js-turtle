@@ -1,5 +1,5 @@
 //draw the tick marks around the edge of the clock
-function ticks(x, y, radius) {
+function ticks(radius) {
    var tickLen = 7;
    var gap = radius - tickLen;
    colour(0,0,255,0.5);
@@ -70,7 +70,7 @@ function hands(hours, minutes, seconds) {
     var minutesAndSeconds = minutesInSeconds + seconds;
     hand(minutesAndSeconds * 0.1, 10, 100, {r: 0, g: 255, b: 0, a: 0.5 });
     // draw hours hand
-    var hoursInSeconds = ((hours % 12) * 3600)
+    var hoursInSeconds = ((hours % 12) * 3600);
     var hoursAndMinutesAndSeconds = hoursInSeconds + minutesAndSeconds;
     hand(hoursAndMinutesAndSeconds * 360 / 43200, 10, 60, {r: 0, g: 0, b: 255, a: 0.5 });
 }
@@ -80,7 +80,7 @@ function clock() {
    clear();
    numbers(0, 0, 115);
    circle(0, 0, 2, 130, 50);
-   ticks(0, 0, 130);
+   ticks(130);
    var d = new Date();
    hands(d.getHours(), d.getMinutes(), d.getSeconds());
 }

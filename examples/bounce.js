@@ -1,9 +1,7 @@
 // rectagles which bounce off the side of the canvas
 function init_drops(n) {
-   const drops = [];
-   n = ~~Math.abs(n);
-
-   while (n--) drops.push({
+   var drops = [];
+   while (n-- > 0) drops.push({
       x: random(-150, 150),
       y: random(-150, 150),
 
@@ -22,24 +20,18 @@ function init_drops(n) {
    return drops;
 }
 
-function rain (drops, n) {
+function rain (drops) {
    clear();
-   for (var i = 0; i < n; i++) {
+   for (var i = 0; i < drops.length; i++) {
       var d = drops[i];
       colour(d.r,d.g,d.b,d.a);
       width(d.width);
       goto(d.x, d.y);
-      if (d.y < -150) {
-         d.velocityY = -d.velocityY;
+      if (d.y < -150 || d.y + d.size > 150 && d.velocityY > 0) {
+         d.velocityY *= -1;
       }
-      else if (d.y + d.size > 150 && d.velocityY > 0) {
-         d.velocityY = -d.velocityY;
-      }
-      if (d.x - d.width/2 < -150) {
-         d.velocityX = -d.velocityX;
-      }
-      else if (d.x + d.width/2 > 150) {
-         d.velocityX = -d.velocityX;
+      if (d.x - d.width/2 < -150 || d.x + d.width/2 > 150) {
+         d.velocityX *= -1;
       }
       forward(d.size);
       d.y += d.velocityY;
@@ -51,5 +43,5 @@ function demo (n) {
    wrap(false);
    hideTurtle();
    drops = init_drops(n);
-   animate(function () { rain(drops, n)}, 100);
+   animate(function() { rain(drops) }, 100);
 }
