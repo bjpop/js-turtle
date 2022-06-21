@@ -372,7 +372,7 @@ const runCommand = function() {
     histFlush();
     const definitionsText = document.getElementById('definitions').value;
     // https://stackoverflow.com/questions/19357978/indirect-eval-call-in-strict-mode
-    // JS never ceases to surprise me
+    // "JS never ceases to surprise me" @Rudxain
     try {
         // execute any code in the definitions box
         (0, eval)(definitionsText);
