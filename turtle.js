@@ -1,12 +1,13 @@
 'use strict';
+const getElByID = document.getElementById;
 // get a handle for the canvases in the document
-const imageCanvas = document.getElementById('imagecanvas');
+const imageCanvas = getElByID('imagecanvas');
 const imageContext = imageCanvas.getContext('2d');
 
 imageContext.textAlign = "center";
 imageContext.textBaseline = "middle";
 
-const turtleCanvas = document.getElementById('turtlecanvas');
+const turtleCanvas = getElByID('turtlecanvas');
 const turtleContext = turtleCanvas.getContext('2d');
 
 // the turtle takes precedence when compositing
@@ -350,7 +351,7 @@ const histFlush = function() {
     }
 }
 
-const cmdBox = document.getElementById('command');
+const cmdBox = getElByID('command');
 
 // Moves up and down in command history
 cmdBox.addEventListener("keydown", function(e) {
@@ -370,7 +371,7 @@ const runCommand = function() {
     const commandText = cmdBox.value;
     histAdd(commandText);
     histFlush();
-    const definitionsText = document.getElementById('definitions').value;
+    const definitionsText = getElByID('definitions').value;
     // https://stackoverflow.com/questions/19357978/indirect-eval-call-in-strict-mode
     // "JS never ceases to surprise me" @Rudxain
     try {
@@ -388,11 +389,11 @@ const runCommand = function() {
 }
 
 // Execute the program in the command box when the user presses "Run" button or "Enter" key
-document.getElementById('runButton').addEventListener('click', runCommand);
+getElByID('runButton').addEventListener('click', runCommand);
 cmdBox.addEventListener('keydown', function(e) {
     if (e.key == "Enter") runCommand();
 });
 
-document.getElementById('resetButton').addEventListener('click', reset);
+getElByID('resetButton').addEventListener('click', reset);
 
 reset();
