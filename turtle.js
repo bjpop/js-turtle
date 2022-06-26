@@ -340,7 +340,7 @@ const histAdd = function(cmdTxt) {
     commandHistSize += cmdTxt.length;
 }
 // removes old entries until memory use is lower
-// essentially, manual hi-level garbage collection
+// essentially, explicit garbage collection
 const histFlush = function() {
     // max CUs to store until a cmd is cleared from history queue
     const HIST_SIZE_LIMIT = 1 << 20;
