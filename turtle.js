@@ -388,7 +388,7 @@ const runCommand = function() {
     }
 }
 
-// Execute the program in the command box when the user presses "Run" button or "Enter" key
+// Execute the program in the command box when the user presses "Run" button or any "Enter" key
 getElByID('runButton').addEventListener('click', runCommand);
 cmdBox.addEventListener('keydown', function(e) {
     if (e.key == "Enter") runCommand();
