@@ -10,16 +10,17 @@ const imageContext = imageCanvas.getContext('2d');
 imageContext.textAlign = "center";
 imageContext.textBaseline = "middle";
 
-/**@type {HTMLCanvasElement}*/
-const turtleCanvas = doc.getElementById('turtlecanvas');
-const turtleContext = turtleCanvas.getContext('2d');
+/**@type {CanvasRenderingContext2D}*/
+const turtleContext = doc.getElementById('turtlecanvas').getContext('2d');
 
 // the turtle takes precedence when compositing
 turtleContext.globalCompositeOperation = 'destination-over';
 
-// specification of relative coordinates for drawing turtle shapes,
-// as lists of [x,y] pairs
-// (The shapes are borrowed from cpython turtle.py)
+/**
+ * specification of relative coordinates for drawing turtle shapes,
+ * as lists of [x,y] pairs.
+ * (The shapes are borrowed from cpython turtle.py)
+ */
 const shapes = {
     "triangle" : [[-5, 0], [5, 0], [0, 15]],
     "turtle": [[0, 16], [-2, 14], [-1, 10], [-4, 7], [-7, 9],
@@ -37,7 +38,7 @@ const shapes = {
                [8.09, -5.88], [9.51, -3.09]]
 };
 
-/**turtle-object constructor. For better "IntelliSense" and less code duplication*/
+/** turtle-object constructor. For better "IntelliSense" and less code duplication */
 const newTurtle = function() {
     return {
         pos: {
@@ -63,16 +64,9 @@ const newTurtle = function() {
 // initialise the state of the turtle
 let turtle = newTurtle();
 
-const initialise = function() {
-    turtle = newTurtle();
-    imageContext.lineWidth = turtle.width;
-    imageContext.strokeStyle = "black";
-    imageContext.globalAlpha = 1;
-}
-
 /**
- * draw the turtle and the current image if redraw is true.
- * for complicated drawings it is much faster to turn redraw off.
+ * draw the turtle and the current image if `redraw` is `true`.
+ * for complicated drawings it is much faster to turn `redraw` off.
 */
 function drawIf() {
     if (turtle.redraw) draw();
@@ -82,17 +76,18 @@ function drawIf() {
  * use canvas centered coordinates facing upwards
  * @param {CanvasRenderingContext2D} context
  */
-function centerCoords(context) {
+const centerCoords =  function(context) {
     context.translate(context.canvas.width / 2, context.canvas.height / 2);
     context.transform(1, 0, 0, -1, 0, 0);
 }
 
-/**draw the turtle and the current image*/
+/** draw the turtle and the current image */
 function draw() {
     clearContext(turtleContext);
     if (turtle.visible) {
-        const x = turtle.pos.x;
-        const y = turtle.pos.y;
+        const
+            x = turtle.pos.x,
+            y = turtle.pos.y;
 
         turtleContext.save();
         centerCoords(turtleContext);
@@ -118,13 +113,7 @@ function draw() {
     turtleContext.drawImage(imageCanvas, 0, 0, 300, 300, 0, 0, 300, 300);
 }
 
-/**clear the display, don't move the turtle*/
-function clear() {
-    clearContext(imageContext);
-    drawIf();
-}
-
-function clearContext(/**@type {CanvasRenderingContext2D}*/ context) {
+const clearContext = function(/**@type {CanvasRenderingContext2D}*/ context) {
     context.save();
     context.setTransform(1, 0, 0, 1, 0, 0);
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
@@ -135,9 +124,22 @@ function clearContext(/**@type {CanvasRenderingContext2D}*/ context) {
  * reset the whole system, clear the display and move turtle back to
  * origin, facing the Y axis.
 */
-function reset() {
+const reset = function() {
+    const initialise = function() {
+        turtle = newTurtle();
+        imageContext.lineWidth = turtle.width;
+        imageContext.strokeStyle = "black";
+        imageContext.globalAlpha = 1;
+    }
     initialise();
+
+    /**clear the display, don't move the turtle*/
+    const clear = function() {
+        clearContext(imageContext);
+        drawIf();
+    }
     clear();
+
     draw();
 }
 
@@ -151,7 +153,7 @@ function forward(distance) {
     centerCoords(imageContext);
     imageContext.beginPath();
 
-    const canv = imageContext.canvas;
+    const canv = imageContext.canvas; // isn't this the same as `imageCanvas`?
 
     // get the boundaries of the canvas
     const maxX = canv.width / 2, minX = -maxX;
