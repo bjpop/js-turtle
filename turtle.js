@@ -76,7 +76,7 @@ function drawIf() {
  * use canvas centered coordinates facing upwards
  * @param {CanvasRenderingContext2D} context
  */
-const centerCoords =  function(context) {
+const _centerCoords =  function(context) {
     context.translate(context.canvas.width / 2, context.canvas.height / 2);
     context.transform(1, 0, 0, -1, 0, 0);
 }
@@ -90,7 +90,7 @@ function draw() {
             y = turtle.pos.y;
 
         turtleContext.save();
-        centerCoords(turtleContext);
+        _centerCoords(turtleContext);
         // move the origin to the turtle center
         turtleContext.translate(x, y);
         // rotate about the center of the turtle
@@ -113,11 +113,17 @@ function draw() {
     turtleContext.drawImage(imageCanvas, 0, 0, 300, 300, 0, 0, 300, 300);
 }
 
-const clearContext = function(/**@type {CanvasRenderingContext2D}*/ context) {
-    context.save();
-    context.setTransform(1, 0, 0, 1, 0, 0);
-    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-    context.restore();
+const clearContext = function(/**@type {CanvasRenderingContext2D}*/ ctx) {
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.restore();
+}
+
+/** clear the display, don't move the turtle */
+const clear = function() {
+    clearContext(imageContext);
+    drawIf();
 }
 
 /**
@@ -132,14 +138,7 @@ const reset = function() {
         imageContext.globalAlpha = 1;
     }
     initialise();
-
-    /**clear the display, don't move the turtle*/
-    const clear = function() {
-        clearContext(imageContext);
-        drawIf();
-    }
     clear();
-
     draw();
 }
 
@@ -150,7 +149,7 @@ const reset = function() {
  */
 function forward(distance) {
     imageContext.save();
-    centerCoords(imageContext);
+    _centerCoords(imageContext);
     imageContext.beginPath();
 
     // get the boundaries of the canvas
@@ -342,7 +341,7 @@ function write(msg) {
     const y = turtle.pos.y;
 
     imageContext.save();
-    centerCoords(imageContext);
+    _centerCoords(imageContext);
 
     //imageContext.rotate(turtle.angle);
     imageContext.translate(x, y);
@@ -420,7 +419,7 @@ function setFont(/**@type {string}*/ font) {
  *
  * this fn is used to encapsulate private stuff that the user shouldn't access
  */
-const main = function() {
+const _main = function() {
     /** to navigate command history (a queue) */
     const cmddHist = [];
     /** current hist index */
@@ -509,4 +508,4 @@ const main = function() {
     reset();
 }
 
-main()
+_main()
