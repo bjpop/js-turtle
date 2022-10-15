@@ -1,20 +1,25 @@
-//@ts-check
 'use strict';
-const doc = document;
+const _doc = document;
+
+/**
+ * Returns the sine and cosine of a number, as a 2-tuple.
+ * @param {number} x
+ */
+const sin_cos = x => [Math.sin(x), Math.cos(x)];
 
 // get a handle for each canvas in the document
 /**@type {HTMLCanvasElement}*/
-const imageCanvas = doc.getElementById('imagecanvas');
-const imageContext = imageCanvas.getContext('2d');
+const _imageCanvas = _doc.getElementById('imagecanvas');
+const _imageCtx = _imageCanvas.getContext('2d');
 
-imageContext.textAlign = "center";
-imageContext.textBaseline = "middle";
+_imageCtx.textAlign = "center";
+_imageCtx.textBaseline = "middle";
 
 /**@type {CanvasRenderingContext2D}*/
-const turtleContext = doc.getElementById('turtlecanvas').getContext('2d');
+const _turtleCtx = _doc.getElementById('turtlecanvas').getContext('2d');
 
 // the turtle takes precedence when compositing
-turtleContext.globalCompositeOperation = 'destination-over';
+_turtleCtx.globalCompositeOperation = 'destination-over';
 
 /**
  * specification of relative coordinates for drawing turtle shapes,
@@ -39,27 +44,25 @@ const shapes = {
 };
 
 /** turtle-object constructor. For better "IntelliSense" and less code duplication */
-const _defaultTurtle = function() {
-    return {
-        pos: {
-            x: 0,
-            y: 0
-        },
-        angle: 0,
-        penDown: true,
-        width: 1,
-        visible: true,
-        redraw: true, // does this belong here?
-        wrap: true,
-        shape: "triangle",
-        colour: {
-            r: 0,
-            g: 0,
-            b: 0,
-            a: 1
-        },
-    };
-};
+const _defaultTurtle = () => ({
+    pos: {
+        x: 0,
+        y: 0
+    },
+    angle: 0,
+    penDown: true,
+    width: 1,
+    visible: true,
+    redraw: true, // does this belong here?
+    wrap: true,
+    shape: "triangle",
+    colour: {
+        r: 0,
+        g: 0,
+        b: 0,
+        a: 1
+    }
+});
 
 // initialise the state of the turtle
 let turtle = _defaultTurtle();
@@ -68,52 +71,50 @@ let turtle = _defaultTurtle();
  * draw the turtle and the current image if `redraw` is `true`.
  * for complicated drawings it is much faster to turn `redraw` off.
 */
-function drawIf() {
-    if (turtle.redraw) draw();
-}
+function drawIf() { if (turtle.redraw) draw() }
 
 /**
  * use canvas centered coordinates facing upwards
- * @param {CanvasRenderingContext2D} context
+ * @param {CanvasRenderingContext2D} ctx
  */
-const _centerCoords =  function(context) {
-    context.translate(context.canvas.width / 2, context.canvas.height / 2);
-    context.transform(1, 0, 0, -1, 0, 0);
+const _centerCoords = ctx => {
+    ctx.translate(ctx.canvas.width / 2, ctx.canvas.height / 2);
+    ctx.transform(1, 0, 0, -1, 0, 0);
 };
 
 /** draw the turtle and the current image */
 function draw() {
-    clearContext(turtleContext);
+    _clearCtx(_turtleCtx);
     if (turtle.visible) {
         const
             x = turtle.pos.x,
             y = turtle.pos.y;
 
-        turtleContext.save();
-        _centerCoords(turtleContext);
+        _turtleCtx.save();
+        _centerCoords(_turtleCtx);
         // move the origin to the turtle center
-        turtleContext.translate(x, y);
+        _turtleCtx.translate(x, y);
         // rotate about the center of the turtle
-        turtleContext.rotate(-turtle.angle);
+        _turtleCtx.rotate(-turtle.angle);
         // move the turtle back to its position
-        turtleContext.translate(-x, -y);
+        _turtleCtx.translate(-x, -y);
         // draw the turtle icon
         const icon = shapes.hasOwnProperty(turtle.shape) ?
             turtle.shape : "triangle";
-        turtleContext.beginPath();
+        _turtleCtx.beginPath();
         for (let i=0; i < shapes[icon].length; i++) {
             const coord = shapes[icon][i];
-            turtleContext[i==0 ? 'moveTo' : 'lineTo'](x+coord[0], y+coord[1]);
+            _turtleCtx[i==0 ? 'moveTo' : 'lineTo'](x+coord[0], y+coord[1]);
         }
-        turtleContext.closePath();
-        turtleContext.fillStyle = "green";
-        turtleContext.fill();
-        turtleContext.restore();
+        _turtleCtx.closePath();
+        _turtleCtx.fillStyle = "green";
+        _turtleCtx.fill();
+        _turtleCtx.restore();
     }
-    turtleContext.drawImage(imageCanvas, 0, 0, 300, 300, 0, 0, 300, 300);
+    _turtleCtx.drawImage(_imageCanvas, 0, 0, 300, 300, 0, 0, 300, 300);
 }
 
-const clearContext = function(/**@type {CanvasRenderingContext2D}*/ ctx) {
+const _clearCtx = (/**@type {CanvasRenderingContext2D}*/ ctx) => {
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -121,26 +122,25 @@ const clearContext = function(/**@type {CanvasRenderingContext2D}*/ ctx) {
 };
 
 /** clear the display, don't move the turtle */
-const clear = function() {
-    clearContext(imageContext);
+function clear() {
+    _clearCtx(_imageCtx);
     drawIf();
-};
+}
 
 /**
  * reset the whole system, clear the display and move turtle back to
  * origin, facing the Y axis.
 */
-const reset = function() {
-    const initialise = function() {
-        turtle = _defaultTurtle();
-        imageContext.lineWidth = turtle.width;
-        imageContext.strokeStyle = "black";
-        imageContext.globalAlpha = 1;
-    };
-    initialise();
+function reset() {
+    // initialise
+    turtle = _defaultTurtle();
+    _imageCtx.lineWidth = turtle.width;
+    _imageCtx.strokeStyle = "black";
+    _imageCtx.globalAlpha = 1;
+
     clear();
     draw();
-};
+}
 
 /**
  * Trace the forward motion of the turtle, allowing for possible
@@ -148,28 +148,25 @@ const reset = function() {
  * @param {number} distance
  */
 function forward(distance) {
-    imageContext.save();
-    _centerCoords(imageContext);
-    imageContext.beginPath();
+    _imageCtx.save();
+    _centerCoords(_imageCtx);
+    _imageCtx.beginPath();
 
     // get the boundaries of the canvas
     const
-        maxX = imageCanvas.width / 2, minX = -maxX,
-        maxY = imageCanvas.height / 2, minY = -maxY;
+        maxX = _imageCanvas.width / 2, minX = -maxX,
+        maxY = _imageCanvas.height / 2, minY = -maxY;
 
-    let
-        x = turtle.pos.x,
-        y = turtle.pos.y;
+    let {x, y} = turtle.pos;
 
     // trace out the forward steps
     while (distance > 0) {
         // move to the current location of the turtle
-        imageContext.moveTo(x, y);
+        _imageCtx.moveTo(x, y);
 
         // calculate the new location of the turtle after doing the forward movement
         const
-            cosAngle = Math.cos(turtle.angle),
-            sinAngle = Math.sin(turtle.angle),
+            [sinAngle, cosAngle] = sin_cos(turtle.angle),
             newX = x + sinAngle * distance,
             newY = y + cosAngle * distance;
 
@@ -178,10 +175,10 @@ function forward(distance) {
          * @param {number} cutBound
          * @param {number} otherBound
          */
-        const xWrap = function(cutBound, otherBound) {
+        const xWrap = (cutBound, otherBound) => {
             const distanceToEdge = Math.abs((cutBound - x) / sinAngle);
             const edgeY = cosAngle * distanceToEdge + y;
-            imageContext.lineTo(cutBound, edgeY);
+            _imageCtx.lineTo(cutBound, edgeY);
             distance -= distanceToEdge;
             x = otherBound;
             y = edgeY;
@@ -191,17 +188,17 @@ function forward(distance) {
          * @param {number} cutBound
          * @param {number} otherBound
          */
-        const yWrap = function(cutBound, otherBound) {
+        const yWrap = (cutBound, otherBound) => {
             const distanceToEdge = Math.abs((cutBound - y) / cosAngle);
             const edgeX = sinAngle * distanceToEdge + x;
-            imageContext.lineTo(edgeX, cutBound);
+            _imageCtx.lineTo(edgeX, cutBound);
             distance -= distanceToEdge;
             x = edgeX;
             y = otherBound;
         };
         /** don't wrap the turtle on any boundary */
-        const noWrap = function() {
-            imageContext.lineTo(newX, newY);
+        const noWrap = () => {
+            _imageCtx.lineTo(newX, newY);
             turtle.pos.x = newX;
             turtle.pos.y = newY;
             distance = 0;
@@ -226,8 +223,8 @@ function forward(distance) {
     }
     // only draw if the pen is currently down.
     if (turtle.penDown)
-        imageContext.stroke();
-    imageContext.restore();
+        _imageCtx.stroke();
+    _imageCtx.restore();
     drawIf();
 }
 
@@ -235,9 +232,7 @@ function forward(distance) {
  * turn edge wrapping on/off
  * @param {boolean} b
  */
-function wrap(b) {
-    turtle.wrap = b;
-}
+function wrap(b) { turtle.wrap = b }
 
 function hideTurtle() {
     turtle.visible = false;
@@ -253,18 +248,12 @@ function showTurtle() {
  * turn on/off redrawing
  * @param {boolean} b
  */
-function redrawOnMove(b) {
-    turtle.redraw = b;
-}
+function redrawOnMove(b) { turtle.redraw = b }
 
 /** lift up the pen (don't draw) */
-function penup() {
-    turtle.penDown = false;
-}
+function penup() { turtle.penDown = false }
 /** put the pen down (do draw) */
-function pendown() {
-    turtle.penDown = true;
-}
+function pendown() { turtle.penDown = true }
 
 /**
  * turn right by an angle in degrees
@@ -305,13 +294,13 @@ function angle(angle) { turtle.angle = degToRad(angle) }
  * convert degrees to radians
  * @param {number} deg
  */
-const degToRad = function(deg) { return deg / 180 * Math.PI };
+const degToRad = deg => deg / 180 * Math.PI;
 
 /**
  * convert radians to degrees
  * @param {number} rad
  */
-const radToDeg = function(rad) { return rad * 180 / Math.PI };
+const radToDeg = rad => rad * 180 / Math.PI;
 
 /**
  * set the width of the line
@@ -319,7 +308,7 @@ const radToDeg = function(rad) { return rad * 180 / Math.PI };
  */
 function width(w) {
     turtle.width = w;
-    imageContext.lineWidth = w;
+    _imageCtx.lineWidth = w;
 }
 
 /**
@@ -331,18 +320,17 @@ function width(w) {
  * @param {string} msg
  */
 function write(msg) {
-    const x = turtle.pos.x;
-    const y = turtle.pos.y;
+    const {x, y} = turtle.pos;
 
-    imageContext.save();
-    _centerCoords(imageContext);
+    _imageCtx.save();
+    _centerCoords(_imageCtx);
 
     //imageContext.rotate(turtle.angle);
-    imageContext.translate(x, y);
-    imageContext.transform(1, 0, 0, -1, 0, 0);
-    imageContext.translate(-x, -y);
-    imageContext.fillText(msg, x, y);
-    imageContext.restore();
+    _imageCtx.translate(x, y);
+    _imageCtx.transform(1, 0, 0, -1, 0, 0);
+    _imageCtx.translate(-x, -y);
+    _imageCtx.fillText(msg, x, y);
+    _imageCtx.restore();
 
     drawIf();
 }
@@ -366,7 +354,7 @@ function shape(s) {
  * @param {number} a
  */
 function colour(r, g, b, a) { // should this have a `color` alias?
-    imageContext.strokeStyle = "rgba(" + r + "," + g + "," + b + "," + a + ")";
+    _imageCtx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
     turtle.colour.r = r;
     turtle.colour.g = g;
     turtle.colour.b = b;
@@ -378,13 +366,11 @@ function colour(r, g, b, a) { // should this have a `color` alias?
  * @param {number} min
  * @param {number} max
  */
-const random = function(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + +min);
-};
+const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + +min);
 
 /**
  * @param {number} n
- * @param {() => void} action
+ * @param {Function} action
  */
 function repeat(n, action) {
     for (let count = 1; count <= n; count++)
@@ -396,13 +382,9 @@ function repeat(n, action) {
  * @param {TimerHandler} f
  * @param {number | undefined} ms
  */
-const animate = function(f, ms) {
-    return setInterval(f, ms);
-};
+const animate = (f, ms) => setInterval(f, ms);
 
-function setFont(/**@type {string}*/ font) {
-    imageContext.font = font;
-}
+function setFont(/**@type {string}*/ font) { _imageCtx.font = font }
 
 
 /**
@@ -410,7 +392,9 @@ function setFont(/**@type {string}*/ font) {
  *
  * this fn is used to encapsulate private stuff that the user shouldn't access
  */
-const _main = function() {
+const _main = () => {
+    // we could use OOP to gather all of this `hist` logic in a single object... (to-do)
+
     /** to navigate command history (a queue) */
     const cmddHist = [];
     /** current hist index */
@@ -426,7 +410,7 @@ const _main = function() {
      * append command to history
      * @param {string} cmdTxt
      */
-    const histAdd = function(cmdTxt) {
+    const histAdd = cmdTxt => {
         // queue, then set index to newest entry
         cmdIdx = cmddHist.push(cmdTxt);
         // ensure it's up-to-date, to avoid "memory leaks"
@@ -437,7 +421,7 @@ const _main = function() {
      * removes old history entries until memory-use is lower.
      * essentially, explicit garbage collection.
      */
-    const histFlush = function() {
+    const histFlush = () => {
         /** max CUs to store until a cmd is cleared from history queue */
         const HIST_SIZE_LIMIT = 1 << 20;
         while (cmdHistSize > HIST_SIZE_LIMIT) {
@@ -448,10 +432,10 @@ const _main = function() {
     };
 
     /**@type {HTMLInputElement}*/
-    const cmdBox = doc.getElementById('command');
+    const cmdBox = _doc.getElementById('command');
 
     // Moves up and down in command history
-    cmdBox.addEventListener("keydown", function(e) {
+    cmdBox.addEventListener("keydown", e => {
         if (e.key == "ArrowUp") {
             if (--cmdIdx < 0)
                 cmdIdx = 0;
@@ -465,9 +449,9 @@ const _main = function() {
     }, false);
 
     /**@type {HTMLTextAreaElement}*/
-    const def = doc.getElementById('definitions');
+    const def = _doc.getElementById('definitions');
 
-    const runCommand = function() {
+    const runCommand = () => {
         const commandText = cmdBox.value;
         histAdd(commandText);
         histFlush();
@@ -490,12 +474,10 @@ const _main = function() {
     }
 
     // Execute the program in the command box when the user presses "Run" button or any "Enter" key
-    doc.getElementById('runButton').addEventListener('click', runCommand);
-    cmdBox.addEventListener('keydown', function(e) {
-        if (e.key == "Enter") runCommand();
-    });
+    _doc.getElementById('runButton').addEventListener('click', runCommand);
+    cmdBox.addEventListener('keydown', e => { if (e.key == "Enter") runCommand() });
 
-    doc.getElementById('resetButton').addEventListener('click', reset);
+    _doc.getElementById('resetButton').addEventListener('click', reset);
 
     reset();
 };

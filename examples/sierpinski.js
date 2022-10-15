@@ -1,5 +1,7 @@
+// draw a Sierpinski Triangle of arbitrary recursive depth
+
 function halfSierpinski(size, level) {
-   if (level == 0)
+   if (level <= 0)
       forward(size);
    else {
       function part() {
@@ -18,14 +20,14 @@ function halfSierpinski(size, level) {
 }
 
 function sierpinski(size, level) {
-   function part () {
+   function part() {
       halfSierpinski(size, level);
       right(90);
       forward(size);
       right(90);
    }
-   part ();
-   part ();
+   part();
+   part();
 }
 
 function demo() {

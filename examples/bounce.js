@@ -1,6 +1,7 @@
-// rectagles which bounce off the side of the canvas
+// rectangles which bounce off the side of the canvas
+
 function init_drops(n) {
-   var drops = [];
+   const drops = [];
    while (n-- > 0) drops.push({
       x: random(-150, 150),
       y: random(-150, 150),
@@ -20,10 +21,9 @@ function init_drops(n) {
    return drops;
 }
 
-function rain (drops) {
+function rain(drops) {
    clear();
-   for (var i = 0; i < drops.length; i++) {
-      var d = drops[i];
+   for (const d of drops) {
       colour(d.r,d.g,d.b,d.a);
       width(d.width);
       goto(d.x, d.y);
@@ -37,9 +37,9 @@ function rain (drops) {
    }
 }
 
-function demo (n) {
+function demo(n) {
    wrap(false);
    hideTurtle();
-   var drops = init_drops(n);
-   animate(function() { rain(drops) }, 100);
+   const drops = init_drops(n);
+   animate(() => { rain(drops) }, 100);
 }
