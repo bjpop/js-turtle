@@ -39,7 +39,7 @@ const shapes = {
 };
 
 /** turtle-object constructor. For better "IntelliSense" and less code duplication */
-const newTurtle = function() {
+const _defaultTurtle = function() {
     return {
         pos: {
             x: 0,
@@ -59,10 +59,10 @@ const newTurtle = function() {
             a: 1
         },
     };
-}
+};
 
 // initialise the state of the turtle
-let turtle = newTurtle();
+let turtle = _defaultTurtle();
 
 /**
  * draw the turtle and the current image if `redraw` is `true`.
@@ -79,7 +79,7 @@ function drawIf() {
 const _centerCoords =  function(context) {
     context.translate(context.canvas.width / 2, context.canvas.height / 2);
     context.transform(1, 0, 0, -1, 0, 0);
-}
+};
 
 /** draw the turtle and the current image */
 function draw() {
@@ -118,13 +118,13 @@ const clearContext = function(/**@type {CanvasRenderingContext2D}*/ ctx) {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.restore();
-}
+};
 
 /** clear the display, don't move the turtle */
 const clear = function() {
     clearContext(imageContext);
     drawIf();
-}
+};
 
 /**
  * reset the whole system, clear the display and move turtle back to
@@ -132,15 +132,15 @@ const clear = function() {
 */
 const reset = function() {
     const initialise = function() {
-        turtle = newTurtle();
+        turtle = _defaultTurtle();
         imageContext.lineWidth = turtle.width;
         imageContext.strokeStyle = "black";
         imageContext.globalAlpha = 1;
-    }
+    };
     initialise();
     clear();
     draw();
-}
+};
 
 /**
  * Trace the forward motion of the turtle, allowing for possible
@@ -185,7 +185,7 @@ function forward(distance) {
             distance -= distanceToEdge;
             x = otherBound;
             y = edgeY;
-        }
+        };
         /**
          * wrap on the Y boundary
          * @param {number} cutBound
@@ -198,14 +198,14 @@ function forward(distance) {
             distance -= distanceToEdge;
             x = edgeX;
             y = otherBound;
-        }
+        };
         /** don't wrap the turtle on any boundary */
         const noWrap = function() {
             imageContext.lineTo(newX, newY);
             turtle.pos.x = newX;
             turtle.pos.y = newY;
             distance = 0;
-        }
+        };
         // if wrap is on, trace a part segment of the path and wrap on boundary if necessary
         if (turtle.wrap) {
             if (newX > maxX)
@@ -299,25 +299,19 @@ function goto(x, y) {
  * set the angle of the turtle in degrees
  * @param {number} angle
  */
-function angle(angle) {
-    turtle.angle = degToRad(angle);
-}
+function angle(angle) { turtle.angle = degToRad(angle) }
 
 /**
  * convert degrees to radians
  * @param {number} deg
  */
-const degToRad = function(deg) {
-    return deg / 180 * Math.PI;
-}
+const degToRad = function(deg) { return deg / 180 * Math.PI };
 
 /**
  * convert radians to degrees
  * @param {number} rad
  */
-const radToDeg = function(rad) {
-    return rad * 180 / Math.PI;
-}
+const radToDeg = function(rad) { return rad * 180 / Math.PI };
 
 /**
  * set the width of the line
@@ -386,7 +380,7 @@ function colour(r, g, b, a) { // should this have a `color` alias?
  */
 const random = function(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + +min);
-}
+};
 
 /**
  * @param {number} n
@@ -404,18 +398,15 @@ function repeat(n, action) {
  */
 const animate = function(f, ms) {
     return setInterval(f, ms);
-}
+};
 
 function setFont(/**@type {string}*/ font) {
     imageContext.font = font;
 }
 
-//////////////////
-// UI code below//
-//////////////////
 
 /**
- * main program/script.
+ * main program/script, mostly UI code.
  *
  * this fn is used to encapsulate private stuff that the user shouldn't access
  */
@@ -440,7 +431,7 @@ const _main = function() {
         cmdIdx = cmddHist.push(cmdTxt);
         // ensure it's up-to-date, to avoid "memory leaks"
         cmdHistSize += cmdTxt.length;
-    }
+    };
 
     /**
      * removes old history entries until memory-use is lower.
@@ -454,7 +445,7 @@ const _main = function() {
             cmdHistSize -= cmddHist.shift().length;
             cmdIdx--; // index correction
         }
-    }
+    };
 
     /**@type {HTMLInputElement}*/
     const cmdBox = doc.getElementById('command');
@@ -474,12 +465,13 @@ const _main = function() {
     }, false);
 
     /**@type {HTMLTextAreaElement}*/
-    const def = doc.getElementById('definitions')
+    const def = doc.getElementById('definitions');
 
     const runCommand = function() {
         const commandText = cmdBox.value;
         histAdd(commandText);
         histFlush();
+
         const definitionsText = def.value;
         // https://stackoverflow.com/questions/19357978/indirect-eval-call-in-strict-mode
         // "JS never ceases to surprise me" @Rudxain
@@ -506,6 +498,6 @@ const _main = function() {
     doc.getElementById('resetButton').addEventListener('click', reset);
 
     reset();
-}
+};
 
-_main()
+_main();
