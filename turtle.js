@@ -153,14 +153,14 @@ function forward(distance) {
     centerCoords(imageContext);
     imageContext.beginPath();
 
-    const canv = imageContext.canvas; // isn't this the same as `imageCanvas`?
-
     // get the boundaries of the canvas
-    const maxX = canv.width / 2, minX = -maxX;
-    const maxY = canv.height / 2, minY = -maxY;
+    const
+        maxX = imageCanvas.width / 2, minX = -maxX,
+        maxY = imageCanvas.height / 2, minY = -maxY;
 
-    let x = turtle.pos.x;
-    let y = turtle.pos.y;
+    let
+        x = turtle.pos.x,
+        y = turtle.pos.y;
 
     // trace out the forward steps
     while (distance > 0) {
@@ -168,10 +168,11 @@ function forward(distance) {
         imageContext.moveTo(x, y);
 
         // calculate the new location of the turtle after doing the forward movement
-        const cosAngle = Math.cos(turtle.angle);
-        const sinAngle = Math.sin(turtle.angle);
-        const newX = x + sinAngle * distance;
-        const newY = y + cosAngle * distance;
+        const
+            cosAngle = Math.cos(turtle.angle),
+            sinAngle = Math.sin(turtle.angle),
+            newX = x + sinAngle * distance,
+            newY = y + cosAngle * distance;
 
         /**
          * wrap on the X boundary
@@ -199,7 +200,7 @@ function forward(distance) {
             x = edgeX;
             y = otherBound;
         }
-        /**don't wrap the turtle on any boundary*/
+        /** don't wrap the turtle on any boundary */
         const noWrap = function() {
             imageContext.lineTo(newX, newY);
             turtle.pos.x = newX;
@@ -257,11 +258,11 @@ function redrawOnMove(b) {
     turtle.redraw = b;
 }
 
-/**lift up the pen (don't draw)*/
+/** lift up the pen (don't draw) */
 function penup() {
     turtle.penDown = false;
 }
-/**put the pen down (do draw)*/
+/** put the pen down (do draw) */
 function pendown() {
     turtle.penDown = true;
 }
@@ -284,8 +285,8 @@ function left(angle) {
     drawIf();
 }
 
-// move the turtle to a particular coordinate (don't draw on the way there)
 /**
+ * move the turtle to a particular coordinate (don't draw on the way there)
  * @param {number} x
  * @param {number} y
  */
@@ -295,9 +296,9 @@ function goto(x, y) {
     drawIf();
 }
 
-// set the angle of the turtle in degrees
 /**
- * @param {any} angle
+ * set the angle of the turtle in degrees
+ * @param {number} angle
  */
 function angle(angle) {
     turtle.angle = degToRad(angle);
@@ -307,7 +308,7 @@ function angle(angle) {
  * convert degrees to radians
  * @param {number} deg
  */
-function degToRad(deg) {
+const degToRad = function(deg) {
     return deg / 180 * Math.PI;
 }
 
@@ -315,7 +316,7 @@ function degToRad(deg) {
  * convert radians to degrees
  * @param {number} rad
  */
-function radToDeg(rad) {
+const radToDeg = function(rad) {
     return rad * 180 / Math.PI;
 }
 
@@ -354,8 +355,9 @@ function write(msg) {
 }
 
 /**
- * set the turtle draw shape, currently supports
- * triangle (default), circle, square and turtle
+ * set the turtle draw shape
+ *
+ * currently supports triangle (default), circle, square, and turtle
  * @param {string} s
  */
 function shape(s) {
@@ -379,12 +381,12 @@ function colour(r, g, b, a) { // should this have a `color` alias?
 }
 
 /**
- * https://docs.python.org/3/library/random.html#random.randint
- * @param {number} low
- * @param {number} hi
+ * Returns a pseudo-random integer in the range `min` <= n <= `max` (inclusive)
+ * @param {number} min
+ * @param {number} max
  */
-function random(low, hi) {
-    return Math.floor(Math.random() * (hi - low + 1) + low);
+const random = function(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + +min);
 }
 
 /**
@@ -397,17 +399,15 @@ function repeat(n, action) {
 }
 
 /**
+ * an alias of `setInterval`, but 2-adic (no rest args)
  * @param {TimerHandler} f
  * @param {number | undefined} ms
  */
-function animate(f, ms) {
+const animate = function(f, ms) {
     return setInterval(f, ms);
 }
 
-/**
- * @param {string} font
- */
-function setFont(font) {
+function setFont(/**@type {string}*/ font) {
     imageContext.font = font;
 }
 
@@ -415,76 +415,98 @@ function setFont(font) {
 // UI code below//
 //////////////////
 
-// Navigate command history
-const cmddHist = [];
-let cmdIdx = 0;
-let commandHistSize = 0; // measured in code-units, not bytes
+/**
+ * main program/script.
+ *
+ * this fn is used to encapsulate private stuff that the user shouldn't access
+ */
+const main = function() {
+    /** to navigate command history (a queue) */
+    const cmddHist = [];
+    /** current hist index */
+    let cmdIdx = 0;
+    /**
+     * total size of the history in memory.
+     *
+     * for performance, it's measured in **code-units** (16b or 2B), not bytes (8b or 1B).
+     */
+    let cmdHistSize = 0;
 
-// append command to history
-const histAdd = function(/** @type {string | any[]} */ cmdTxt) {
-    // queue and set index to newest entry
-    cmdIdx = cmddHist.push(cmdTxt);
-    commandHistSize += cmdTxt.length;
+    /**
+     * append command to history
+     * @param {string} cmdTxt
+     */
+    const histAdd = function(cmdTxt) {
+        // queue, then set index to newest entry
+        cmdIdx = cmddHist.push(cmdTxt);
+        // ensure it's up-to-date, to avoid "memory leaks"
+        cmdHistSize += cmdTxt.length;
+    }
+
+    /**
+     * removes old history entries until memory-use is lower.
+     * essentially, explicit garbage collection.
+     */
+    const histFlush = function() {
+        /** max CUs to store until a cmd is cleared from history queue */
+        const HIST_SIZE_LIMIT = 1 << 20;
+        while (cmdHistSize > HIST_SIZE_LIMIT) {
+            // dequeue, then update size
+            cmdHistSize -= cmddHist.shift().length;
+            cmdIdx--; // index correction
+        }
+    }
+
+    /**@type {HTMLInputElement}*/
+    const cmdBox = doc.getElementById('command');
+
+    // Moves up and down in command history
+    cmdBox.addEventListener("keydown", function(e) {
+        if (e.key == "ArrowUp") {
+            if (--cmdIdx < 0)
+                cmdIdx = 0;
+            cmdBox.value = cmddHist[cmdIdx] || "";
+        }
+        if (e.key == "ArrowDown") {
+            if (++cmdIdx > cmddHist.length)
+                cmdIdx = cmddHist.length;
+            cmdBox.value = cmddHist[cmdIdx] || "";
+        }
+    }, false);
+
+    /**@type {HTMLTextAreaElement}*/
+    const def = doc.getElementById('definitions')
+
+    const runCommand = function() {
+        const commandText = cmdBox.value;
+        histAdd(commandText);
+        histFlush();
+        const definitionsText = def.value;
+        // https://stackoverflow.com/questions/19357978/indirect-eval-call-in-strict-mode
+        // "JS never ceases to surprise me" @Rudxain
+        try {
+            // execute any code in the definitions box
+            (0, eval)(definitionsText);
+            // execute the code in the command box
+            (0, eval)(commandText);
+        } catch (e) {
+            alert('Exception thrown:\n' + e);
+            throw e;
+        } finally {
+            // clear the command box
+            cmdBox.value = '';
+        }
+    }
+
+    // Execute the program in the command box when the user presses "Run" button or any "Enter" key
+    doc.getElementById('runButton').addEventListener('click', runCommand);
+    cmdBox.addEventListener('keydown', function(e) {
+        if (e.key == "Enter") runCommand();
+    });
+
+    doc.getElementById('resetButton').addEventListener('click', reset);
+
+    reset();
 }
-// removes old entries until memory use is lower
-// essentially, explicit garbage collection
-const histFlush = function() {
-    // max CUs to store until a cmd is cleared from history queue
-    const HIST_SIZE_LIMIT = 1 << 20;
-    while (commandHistSize > HIST_SIZE_LIMIT) {
-        // dequeue, then update size
-        commandHistSize -= cmddHist.shift().length;
-        cmdIdx--; // index correction
-    }
-}
 
-/**@type {HTMLInputElement}*/
-const cmdBox = doc.getElementById('command');
-
-// Moves up and down in command history
-cmdBox.addEventListener("keydown", function(e) {
-    if (e.key == "ArrowUp") {
-        if (--cmdIdx < 0)
-            cmdIdx = 0;
-        cmdBox.value = cmddHist[cmdIdx] || "";
-    }
-    if (e.key == "ArrowDown") {
-        if (++cmdIdx > cmddHist.length)
-            cmdIdx = cmddHist.length;
-        cmdBox.value = cmddHist[cmdIdx] || "";
-    }
-}, false);
-
-/**@type {HTMLTextAreaElement}*/
-const def = doc.getElementById('definitions')
-
-const runCommand = function() {
-    const commandText = cmdBox.value;
-    histAdd(commandText);
-    histFlush();
-    const definitionsText = def.value;
-    // https://stackoverflow.com/questions/19357978/indirect-eval-call-in-strict-mode
-    // "JS never ceases to surprise me" @Rudxain
-    try {
-        // execute any code in the definitions box
-        (0, eval)(definitionsText);
-        // execute the code in the command box
-        (0, eval)(commandText);
-    } catch (e) {
-        alert('Exception thrown:\n' + e);
-        throw e;
-    } finally {
-        // clear the command box
-        cmdBox.value = '';
-    }
-}
-
-// Execute the program in the command box when the user presses "Run" button or any "Enter" key
-doc.getElementById('runButton').addEventListener('click', runCommand);
-cmdBox.addEventListener('keydown', function(e) {
-    if (e.key == "Enter") runCommand();
-});
-
-doc.getElementById('resetButton').addEventListener('click', reset);
-
-reset();
+main()
