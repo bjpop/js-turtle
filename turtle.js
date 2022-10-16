@@ -366,7 +366,7 @@ function colour(r, g, b, a) { // should this have a `color` alias?
  * @param {number} min
  * @param {number} max
  */
-const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + +min);
+const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + +min);// `+` prevents string-concat from external users
 
 /**
  * @param {number} n
