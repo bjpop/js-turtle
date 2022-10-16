@@ -437,13 +437,11 @@ const _main = () => {
     // Moves up and down in command history
     cmdBox.addEventListener("keydown", e => {
         if (e.key == "ArrowUp") {
-            if (--cmdIdx < 0)
-                cmdIdx = 0;
+            cmdIdx = Math.max(cmdIdx - 1, 0); // index must be unsigned
             cmdBox.value = cmddHist[cmdIdx] || "";
         }
         if (e.key == "ArrowDown") {
-            if (++cmdIdx > cmddHist.length)
-                cmdIdx = cmddHist.length;
+            cmdIdx = Math.min(cmdIdx + 1, cmddHist.length); // clamp
             cmdBox.value = cmddHist[cmdIdx] || "";
         }
     }, false);
