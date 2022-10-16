@@ -71,7 +71,7 @@ function hands(hours, minutes, seconds) {
     const minutesAndSeconds = minutesInSeconds + seconds;
     hand(minutesAndSeconds * 0.1, 10, 100, {r: 0, g: 255, b: 0, a: 0.5 });
     // draw hours hand
-    const hoursInSeconds = ((hours % 12) * 3600);
+    const hoursInSeconds = hours % 12 * 3600;
     const hoursAndMinutesAndSeconds = hoursInSeconds + minutesAndSeconds;
     hand(hoursAndMinutesAndSeconds * 360 / 43200, 10, 60, {r: 0, g: 0, b: 255, a: 0.5 });
 }
