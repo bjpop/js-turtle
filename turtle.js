@@ -1,11 +1,6 @@
 'use strict';
+// vars that should be private/local but aren't, are prefixed with "_"
 const _doc = document;
-
-/**
- * Returns the sine and cosine of a number, as a 2-tuple.
- * @param {number} x
- */
-const sin_cos = x => [Math.sin(x), Math.cos(x)];
 
 // get a handle for each canvas in the document
 /**@type {HTMLCanvasElement}*/
@@ -43,6 +38,8 @@ const shapes = {
                [8.09, -5.88], [9.51, -3.09]]
 };
 
+const _DEFAULT_SHAPE = "triangle";
+
 /** turtle-object constructor. For better "IntelliSense" and less code duplication */
 const _defaultTurtle = () => ({
     pos: {
@@ -55,7 +52,7 @@ const _defaultTurtle = () => ({
     visible: true,
     redraw: true, // does this belong here?
     wrap: true,
-    shape: "triangle",
+    shape: _DEFAULT_SHAPE,
     colour: {
         r: 0,
         g: 0,
@@ -86,9 +83,7 @@ const _centerCoords = ctx => {
 function draw() {
     _clearCtx(_turtleCtx);
     if (turtle.visible) {
-        const
-            x = turtle.pos.x,
-            y = turtle.pos.y;
+        const {x, y} = turtle.pos;
 
         _turtleCtx.save();
         _centerCoords(_turtleCtx);
@@ -98,15 +93,27 @@ function draw() {
         _turtleCtx.rotate(-turtle.angle);
         // move the turtle back to its position
         _turtleCtx.translate(-x, -y);
+
+        /**
+         * the type isn't guaranteed, because `shapes` isn't `freeze`d nor `seal`ed,
+         * so the user may mutate it
+         * @type {number[][]}
+        */
+        const icon = shapes[
+            shapes.hasOwnProperty(turtle.shape) ? turtle.shape : _DEFAULT_SHAPE
+        ];
+        const iconLen = icon.length;
+
         // draw the turtle icon
-        const icon = shapes.hasOwnProperty(turtle.shape) ?
-            turtle.shape : "triangle";
         _turtleCtx.beginPath();
-        for (let i=0; i < shapes[icon].length; i++) {
-            const coord = shapes[icon][i];
-            _turtleCtx[i==0 ? 'moveTo' : 'lineTo'](x+coord[0], y+coord[1]);
+        if (iconLen > 0)
+            _turtleCtx.moveTo(x + icon[0][0], y + icon[0][1]);
+        for (let i=1; i < iconLen; i++) {
+            const [cx, cy] = icon[i];
+            _turtleCtx.lineTo(x + cx, y + cy);
         }
         _turtleCtx.closePath();
+
         _turtleCtx.fillStyle = "green";
         _turtleCtx.fill();
         _turtleCtx.restore();
@@ -289,6 +296,12 @@ function goto(x, y) {
  * @param {number} angle
  */
 function angle(angle) { turtle.angle = degToRad(angle) }
+
+/**
+ * Returns the sine and cosine of a number, as a 2-tuple.
+ * @param {number} x
+ */
+const sin_cos = x => [Math.sin(x), Math.cos(x)];
 
 /**
  * convert degrees to radians
