@@ -447,14 +447,10 @@ const _main = () => {
 
     // Moves up and down in command history
     cmdBox.addEventListener('keydown', ({ key }) => {
-        if (key == 'ArrowUp') {
-            cmdIdx = Math.max(cmdIdx - 1, 0); // index must be unsigned
-            cmdBox.value = cmdHist[cmdIdx] || '';
-        }
-        if (key == 'ArrowDown') {
-            cmdIdx = Math.min(cmdIdx + 1, cmdHist.length); // clamp
-            cmdBox.value = cmdHist[cmdIdx] || '';
-        }
+        if (key == 'ArrowDown')    cmdIdx = Math.min(cmdIdx + 1, cmdHist.length); // clamp
+        else if (key == 'ArrowUp') cmdIdx = Math.max(cmdIdx - 1, 0); // index must be unsigned
+        else                       return;
+        cmdBox.value = cmdHist[cmdIdx] || '';
     }, false);
 
     /**@type {HTMLTextAreaElement}*/
