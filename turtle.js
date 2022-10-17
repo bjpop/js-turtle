@@ -70,13 +70,13 @@ const _defaultTurtle = () => ({
 });
 
 // initialise the state of the turtle
-let turtle = _defaultTurtle();
+let _turtle = _defaultTurtle();
 
 /**
  * draw the turtle and the current image if `redraw` is `true`.
  * for complicated drawings it is much faster to turn `redraw` off.
 */
-const drawIf = () => { turtle.redraw && draw(); };
+const drawIf = () => { _turtle.redraw && draw(); };
 
 /**
  * use canvas centered coordinates facing upwards
@@ -91,15 +91,15 @@ const _centerCoords = ctx => {
 /** draw the turtle and the current image */
 const draw = () => {
     _clearCtx(_turtleCtx);
-    if (turtle.visible) {
-        const {x, y} = turtle.pos;
+    if (_turtle.visible) {
+        const {x, y} = _turtle.pos;
 
         _turtleCtx.save();
         _centerCoords(_turtleCtx);
         // move the origin to the turtle center
         _turtleCtx.translate(x, y);
         // rotate about the center of the turtle
-        _turtleCtx.rotate(-turtle.angle);
+        _turtleCtx.rotate(-_turtle.angle);
         // move the turtle back to its position
         _turtleCtx.translate(-x, -y);
 
@@ -109,7 +109,7 @@ const draw = () => {
          * @type {number[][]}
         */
         const icon = _shapes[
-            _shapes.hasOwnProperty(turtle.shape) ? turtle.shape : _DEFAULT_SHAPE
+            _shapes.hasOwnProperty(_turtle.shape) ? _turtle.shape : _DEFAULT_SHAPE
         ];
         const iconLen = icon.length;
 
@@ -150,8 +150,8 @@ const clear = () => {
 */
 const reset = () => {
     // initialise
-    turtle = _defaultTurtle();
-    _imageCtx.lineWidth = turtle.width;
+    _turtle = _defaultTurtle();
+    _imageCtx.lineWidth = _turtle.width;
     _imageCtx.strokeStyle = 'black';
     _imageCtx.globalAlpha = 1;
 
@@ -182,7 +182,7 @@ const forward = distance => {
      */
     const sin_cos = x => [sin(x), cos(x)];
 
-    let {x, y} = turtle.pos;
+    let {x, y} = _turtle.pos;
 
     // trace out the forward steps
     while (distance > 0) {
@@ -191,7 +191,7 @@ const forward = distance => {
 
         // calculate the new location of the turtle after doing the forward movement
         const
-            [sinAngle, cosAngle] = sin_cos(turtle.angle),
+            [sinAngle, cosAngle] = sin_cos(_turtle.angle),
             newX = x + sinAngle * distance,
             newY = y + cosAngle * distance;
 
@@ -224,12 +224,12 @@ const forward = distance => {
         /** don't wrap the turtle on any boundary */
         const noWrap = () => {
             _imageCtx.lineTo(newX, newY);
-            turtle.pos.x = newX;
-            turtle.pos.y = newY;
+            _turtle.pos.x = newX;
+            _turtle.pos.y = newY;
             distance = 0;
         };
         // if wrap is on, trace a part segment of the path and wrap on boundary if necessary
-        if (turtle.wrap)
+        if (_turtle.wrap)
             if (newX > maxX)
                 xWrap(maxX, minX);
             else if (newX < minX)
@@ -245,7 +245,7 @@ const forward = distance => {
             noWrap();
     }
     // only draw if the pen is currently down.
-    turtle.penDown && _imageCtx.stroke();
+    _turtle.penDown && _imageCtx.stroke();
     _imageCtx.restore();
     drawIf();
 };
@@ -254,15 +254,15 @@ const forward = distance => {
  * turn edge wrapping on/off
  * @param {boolean} b
  */
-const wrap = b => { turtle.wrap = b; };
+const wrap = b => { _turtle.wrap = b; };
 
 const hideTurtle = () => {
-    turtle.visible = false;
+    _turtle.visible = false;
     drawIf();
 };
 
 const showTurtle = () => {
-    turtle.visible = true;
+    _turtle.visible = true;
     drawIf();
 };
 
@@ -270,19 +270,19 @@ const showTurtle = () => {
  * turn on/off redrawing
  * @param {boolean} b
  */
-const redrawOnMove = b => { turtle.redraw = b; };
+const redrawOnMove = b => { _turtle.redraw = b; };
 
 /** lift up the pen (don't draw) */
-const penup = () => { turtle.penDown = false; };
+const penup = () => { _turtle.penDown = false; };
 /** put the pen down (do draw) */
-const pendown = () => { turtle.penDown = true; };
+const pendown = () => { _turtle.penDown = true; };
 
 /**
  * turn right by an angle in degrees
  * @param {number} angle
  */
 const right = angle => {
-    turtle.angle += _degToRad(angle);
+    _turtle.angle += _degToRad(angle);
     drawIf();
 };
 
@@ -291,7 +291,7 @@ const right = angle => {
  * @param {number} angle
  */
 const left = angle => {
-    turtle.angle -= _degToRad(angle);
+    _turtle.angle -= _degToRad(angle);
     drawIf();
 };
 
@@ -301,8 +301,8 @@ const left = angle => {
  * @param {number} y
  */
 const goto = (x, y) => {
-    turtle.pos.x = +x;
-    turtle.pos.y = +y;
+    _turtle.pos.x = +x;
+    _turtle.pos.y = +y;
     drawIf();
 };
 
@@ -310,7 +310,7 @@ const goto = (x, y) => {
  * set the angle of the turtle in degrees
  * @param {number} a
  */
-const angle = a => { turtle.angle = _degToRad(a); };
+const angle = a => { _turtle.angle = _degToRad(a); };
 
 /**
  * convert degrees to radians
@@ -330,7 +330,7 @@ const _radToDeg = rad => rad * 180 / Math.PI;
  */
 const width = w => {
     w = +w;
-    turtle.width = w;
+    _turtle.width = w;
     _imageCtx.lineWidth = w;
 };
 
@@ -344,7 +344,7 @@ const width = w => {
  * @param {string} font
  */
 const write = (msg, font) => {
-    const {x, y} = turtle.pos;
+    const {x, y} = _turtle.pos;
 
     _imageCtx.save();
     _centerCoords(_imageCtx);
@@ -367,7 +367,7 @@ const write = (msg, font) => {
  * @param {string} s
  */
 const shape = s => {
-    turtle.shape = s;
+    _turtle.shape = s;
     draw();
 };
 
@@ -402,7 +402,7 @@ const colour = (r, g, b, a) => {
     a = +a;
 
     _imageCtx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
-    const c = turtle.colour;
+    const c = _turtle.colour;
     c.r = r;
     c.g = g;
     c.b = b;
