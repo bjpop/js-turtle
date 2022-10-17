@@ -487,13 +487,21 @@ const _main = () => {
     const cmdBox = doc.getElementById('command');
 
     cmdBox.addEventListener('keydown', ({ key }) => {
-        // Moves up and down in command history
-        if (key == 'ArrowDown')    cmdIdx = Math.min(cmdIdx + 1, cmdHist.length); // clamp
-        else if (key == 'ArrowUp') cmdIdx = Math.max(cmdIdx - 1, 0); // index must be unsigned
-        // Execute program in the command box when user presses any "Enter" or "Return" keys
-        else if (key == 'Enter')   return runCmd();
-        else                       return;
-        // fall-through
+        switch (key) {
+            // Moves up and down in command history
+            case 'ArrowDown':
+                cmdIdx = Math.min(cmdIdx + 1, cmdHist.length); // clamp
+                break;
+            case 'ArrowUp':
+                cmdIdx = Math.max(cmdIdx - 1, 0); // index must be unsigned
+                break;
+            // Execute program in the command box when user presses any "Enter" or "Return" keys
+            case 'Enter':
+                return runCmd();
+            default:
+                return;
+        }
+        // external fall-through, only executed if `return` isn't touched
         cmdBox.value = cmdHist[cmdIdx] || '';
     }, false);
 
