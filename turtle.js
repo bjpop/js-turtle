@@ -1,4 +1,3 @@
-//@ts-check
 'use strict';
 // vars that should be private/local but aren't, are prefixed with `_`
 
@@ -163,8 +162,9 @@ function forward(distance) {
 
     // get the boundaries of the canvas
     const
-        maxX = _imageCanvas.width / 2, minX = -maxX,
-        maxY = _imageCanvas.height / 2, minY = -maxY,
+        {width: w, height: h} = _imageCanvas,
+        maxX = w / 2, minX = -maxX,
+        maxY = h / 2, minY = -maxY,
         {abs} = Math;
 
     let {x, y} = turtle.pos;
