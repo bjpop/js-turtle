@@ -1,3 +1,4 @@
+//@ts-check
 'use strict';
 // vars that should be private/local but aren't, are prefixed with `_`
 
@@ -74,7 +75,8 @@ function drawIf() { turtle.redraw && draw(); }
  * @param {CanvasRenderingContext2D} ctx
  */
 const _centerCoords = ctx => {
-    ctx.translate(ctx.canvas.width / 2, ctx.canvas.height / 2);
+    const {width: w, height: h} = ctx.canvas;
+    ctx.translate(w / 2, h / 2);
     ctx.transform(1, 0, 0, -1, 0, 0);
 };
 
@@ -121,9 +123,10 @@ function draw() {
 }
 
 const _clearCtx = (/**@type {CanvasRenderingContext2D}*/ ctx) => {
+    const {width: w, height: h} = ctx.canvas;
     ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.setTransform( 1,0,0,1,0,0 );
+    ctx.clearRect( 0,0,w,h );
     ctx.restore();
 };
 
@@ -161,7 +164,8 @@ function forward(distance) {
     // get the boundaries of the canvas
     const
         maxX = _imageCanvas.width / 2, minX = -maxX,
-        maxY = _imageCanvas.height / 2, minY = -maxY;
+        maxY = _imageCanvas.height / 2, minY = -maxY,
+        {abs} = Math;
 
     let {x, y} = turtle.pos;
 
@@ -182,7 +186,7 @@ function forward(distance) {
          * @param {number} otherBound
          */
         const xWrap = (cutBound, otherBound) => {
-            const distanceToEdge = Math.abs((cutBound - x) / sinAngle);
+            const distanceToEdge = abs((cutBound - x) / sinAngle);
             const edgeY = cosAngle * distanceToEdge + y;
             _imageCtx.lineTo(cutBound, edgeY);
             distance -= distanceToEdge;
@@ -195,7 +199,7 @@ function forward(distance) {
          * @param {number} otherBound
          */
         const yWrap = (cutBound, otherBound) => {
-            const distanceToEdge = Math.abs((cutBound - y) / cosAngle);
+            const distanceToEdge = abs((cutBound - y) / cosAngle);
             const edgeX = sinAngle * distanceToEdge + x;
             _imageCtx.lineTo(edgeX, cutBound);
             distance -= distanceToEdge;
