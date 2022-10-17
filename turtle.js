@@ -418,16 +418,14 @@ const random = (min, max) => {
 };
 
 /**
- * @param {number} n
- * @param {Function} action
+ * repeatedly run an "action" callback `n` times
+ * @param {number} n (integer)
+ * @param {Function} action (callback)
  */
-const repeat = (n, action) => {
-    for (let count = 1; count <= +n; count++)
-        action();
-};
+const repeat = (n, action) => { while (n-- > 0) action(); };
 
 /**
- * an alias of `setInterval`, but 2-adic (no rest args)
+ * `setInterval` alias, but 2-adic (no rest args)
  * @param {TimerHandler} f
  * @param {number | undefined} ms
  */
