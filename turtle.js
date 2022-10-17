@@ -486,10 +486,11 @@ const _main = () => {
     /**@type {HTMLInputElement}*/
     const cmdBox = doc.getElementById('command');
 
-    // Moves up and down in command history
     cmdBox.addEventListener('keydown', ({ key }) => {
+        // Moves up and down in command history
         if (key == 'ArrowDown')    cmdIdx = Math.min(cmdIdx + 1, cmdHist.length); // clamp
         else if (key == 'ArrowUp') cmdIdx = Math.max(cmdIdx - 1, 0); // index must be unsigned
+        // Execute program in the command box when user presses any "Enter" or "Return" keys
         else if (key == 'Enter')   return runCmd();
         else                       return;
         cmdBox.value = cmdHist[cmdIdx] || '';
@@ -520,11 +521,9 @@ const _main = () => {
         }
     }
 
-    // Execute the program in the command box when the user presses "Run" button or any "Enter" key
+    // Execute program in the command box when user presses "Run"
     doc.getElementById('runButton').addEventListener('click', runCmd);
-
     doc.getElementById('resetButton').addEventListener('click', reset);
-
     reset();
 };
 
