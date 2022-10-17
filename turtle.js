@@ -1,3 +1,4 @@
+//@ts-check
 'use strict';
 /*
 vars that should be private/local but are public/global, should be prefixed with `_`.
@@ -439,7 +440,12 @@ const animate = (f, ms) => setInterval(f, ms);
 const _main = () => {
     const doc = document;
 
-    // we could use OOP to gather all of this `hist` logic in a single object... (to-do)
+    // simplify history API
+    const History = class {
+        constructor(maxLen = 1 << 16) {
+            this.maxLen = maxLen;
+        }
+    };
 
     /** to navigate command history (a queue) */
     const cmdHist = [];
@@ -484,6 +490,7 @@ const _main = () => {
     cmdBox.addEventListener('keydown', ({ key }) => {
         if (key == 'ArrowDown')    cmdIdx = Math.min(cmdIdx + 1, cmdHist.length); // clamp
         else if (key == 'ArrowUp') cmdIdx = Math.max(cmdIdx - 1, 0); // index must be unsigned
+        else if (key == 'Enter')   return runCmd();
         else                       return;
         cmdBox.value = cmdHist[cmdIdx] || '';
     }, false);
@@ -515,7 +522,6 @@ const _main = () => {
 
     // Execute the program in the command box when the user presses "Run" button or any "Enter" key
     doc.getElementById('runButton').addEventListener('click', runCmd);
-    cmdBox.addEventListener('keydown', e => e.key == 'Enter' && runCmd());
 
     doc.getElementById('resetButton').addEventListener('click', reset);
 
