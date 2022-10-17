@@ -1,17 +1,16 @@
 'use strict';
 // vars that should be private/local but aren't, are prefixed with `_`
-const _doc = document;
 
 // get a handle for each canvas in the document
 /**@type {HTMLCanvasElement}*/
-const _imageCanvas = _doc.getElementById('imagecanvas');
+const _imageCanvas = document.getElementById('imagecanvas');
 const _imageCtx = _imageCanvas.getContext('2d');
 
 _imageCtx.textAlign = 'center';
 _imageCtx.textBaseline = 'middle';
 
 /**@type {CanvasRenderingContext2D}*/
-const _turtleCtx = _doc.getElementById('turtlecanvas').getContext('2d');
+const _turtleCtx = document.getElementById('turtlecanvas').getContext('2d');
 
 // the turtle takes precedence when compositing
 _turtleCtx.globalCompositeOperation = 'destination-over';
@@ -403,6 +402,8 @@ function setFont(/**@type {string}*/ font) { _imageCtx.font = font; }
  * this fn is used to encapsulate private stuff that the user shouldn't access
  */
 const _main = () => {
+    const doc = document;
+
     // we could use OOP to gather all of this `hist` logic in a single object... (to-do)
 
     /** to navigate command history (a queue) */
@@ -442,7 +443,7 @@ const _main = () => {
     };
 
     /**@type {HTMLInputElement}*/
-    const cmdBox = _doc.getElementById('command');
+    const cmdBox = doc.getElementById('command');
 
     // Moves up and down in command history
     cmdBox.addEventListener('keydown', ({ key }) => {
@@ -457,7 +458,7 @@ const _main = () => {
     }, false);
 
     /**@type {HTMLTextAreaElement}*/
-    const def = _doc.getElementById('definitions');
+    const def = doc.getElementById('definitions');
 
     const runCommand = () => {
         const commandText = cmdBox.value;
@@ -482,10 +483,10 @@ const _main = () => {
     }
 
     // Execute the program in the command box when the user presses "Run" button or any "Enter" key
-    _doc.getElementById('runButton').addEventListener('click', runCommand);
+    doc.getElementById('runButton').addEventListener('click', runCommand);
     cmdBox.addEventListener('keydown', e => e.key == 'Enter' && runCommand());
 
-    _doc.getElementById('resetButton').addEventListener('click', reset);
+    doc.getElementById('resetButton').addEventListener('click', reset);
 
     reset();
 };
