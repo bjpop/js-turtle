@@ -534,9 +534,15 @@ const _main = () => {
         }
     }
 
+    /**
+     * Similar to JQuery
+     * @param {string} id HTML element ID
+     * @param {(this: HTMLElement, ev: MouseEvent) => any} cb callback
+     */
+    const listenClickById = (id, cb) => doc.getElementById(id).addEventListener('click', cb);
     // Execute program in the command box when user presses "Run"
-    doc.getElementById('runButton').addEventListener('click', runCmd);
-    doc.getElementById('resetButton').addEventListener('click', reset);
+    listenClickById('runButton', runCmd);
+    listenClickById('resetButton', reset);
     reset();
 };
 
