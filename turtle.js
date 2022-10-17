@@ -1,5 +1,9 @@
 'use strict';
-// vars that should be private/local but aren't, are prefixed with `_`
+/*
+vars that should be private/local but are public/global, should be prefixed with `_`.
+
+public API (for the user) fns should sanitize their inputs, usually via unary-plus `+`.
+*/
 
 // get a handle for each canvas in the document
 /**@type {HTMLCanvasElement}*/
@@ -67,7 +71,7 @@ let turtle = _defaultTurtle();
  * draw the turtle and the current image if `redraw` is `true`.
  * for complicated drawings it is much faster to turn `redraw` off.
 */
-function drawIf() { turtle.redraw && draw(); }
+const drawIf = () => { turtle.redraw && draw(); };
 
 /**
  * use canvas centered coordinates facing upwards
@@ -80,7 +84,7 @@ const _centerCoords = ctx => {
 };
 
 /** draw the turtle and the current image */
-function draw() {
+const draw = () => {
     _clearCtx(_turtleCtx);
     if (turtle.visible) {
         const {x, y} = turtle.pos;
@@ -119,7 +123,7 @@ function draw() {
         _turtleCtx.restore();
     }
     _turtleCtx.drawImage(_imageCanvas, 0, 0, 300, 300, 0, 0, 300, 300);
-}
+};
 
 const _clearCtx = (/**@type {CanvasRenderingContext2D}*/ ctx) => {
     const {width: w, height: h} = ctx.canvas;
@@ -130,16 +134,16 @@ const _clearCtx = (/**@type {CanvasRenderingContext2D}*/ ctx) => {
 };
 
 /** clear the display, don't move the turtle */
-function clear() {
+const clear = () => {
     _clearCtx(_imageCtx);
     drawIf();
-}
+};
 
 /**
  * reset the whole system, clear the display and move turtle back to
  * origin, facing the Y axis.
 */
-function reset() {
+const reset = () => {
     // initialise
     turtle = _defaultTurtle();
     _imageCtx.lineWidth = turtle.width;
@@ -148,14 +152,14 @@ function reset() {
 
     clear();
     draw();
-}
+};
 
 /**
  * Trace the forward motion of the turtle, allowing for possible
  * wrap-around at the boundaries of the canvas.
  * @param {number} distance
  */
-function forward(distance) {
+const forward = distance => {
     _imageCtx.save();
     _centerCoords(_imageCtx);
     _imageCtx.beginPath();
@@ -165,7 +169,13 @@ function forward(distance) {
         {width: w, height: h} = _imageCanvas,
         maxX = w / 2, minX = -maxX,
         maxY = h / 2, minY = -maxY,
-        {abs} = Math;
+        {abs, sin, cos} = Math;
+
+    /**
+     * Returns the sine and cosine of a number, as a 2-tuple.
+     * @param {number} x
+     */
+    const sin_cos = x => [sin(x), cos(x)];
 
     let {x, y} = turtle.pos;
 
@@ -233,120 +243,117 @@ function forward(distance) {
     turtle.penDown && _imageCtx.stroke();
     _imageCtx.restore();
     drawIf();
-}
+};
 
 /**
  * turn edge wrapping on/off
  * @param {boolean} b
  */
-function wrap(b) { turtle.wrap = b; }
+const wrap = b => { turtle.wrap = b; };
 
-function hideTurtle() {
+const hideTurtle = () => {
     turtle.visible = false;
     drawIf();
-}
+};
 
-function showTurtle() {
+const showTurtle = () => {
     turtle.visible = true;
     drawIf();
-}
+};
 
 /**
  * turn on/off redrawing
  * @param {boolean} b
  */
-function redrawOnMove(b) { turtle.redraw = b; }
+const redrawOnMove = b => { turtle.redraw = b; };
 
 /** lift up the pen (don't draw) */
-function penup() { turtle.penDown = false; }
+const penup = () => { turtle.penDown = false; };
 /** put the pen down (do draw) */
-function pendown() { turtle.penDown = true; }
+const pendown = () => { turtle.penDown = true; };
 
 /**
  * turn right by an angle in degrees
  * @param {number} angle
  */
-function right(angle) {
-    turtle.angle += degToRad(angle);
+const right = angle => {
+    turtle.angle += _degToRad(angle);
     drawIf();
-}
+};
 
 /**
  * turn left by an angle in degrees
  * @param {number} angle
  */
-function left(angle) {
-    turtle.angle -= degToRad(angle);
+const left = angle => {
+    turtle.angle -= _degToRad(angle);
     drawIf();
-}
+};
 
 /**
  * move the turtle to a particular coordinate (don't draw on the way there)
  * @param {number} x
  * @param {number} y
  */
-function goto(x, y) {
-    turtle.pos.x = x;
-    turtle.pos.y = y;
+const goto = (x, y) => {
+    turtle.pos.x = +x;
+    turtle.pos.y = +y;
     drawIf();
-}
+};
 
 /**
  * set the angle of the turtle in degrees
- * @param {number} angle
+ * @param {number} a
  */
-function angle(angle) { turtle.angle = degToRad(angle); }
-
-/**
- * Returns the sine and cosine of a number, as a 2-tuple.
- * @param {number} x
- */
-const sin_cos = x => [Math.sin(x), Math.cos(x)];
+const angle = a => { turtle.angle = _degToRad(a); };
 
 /**
  * convert degrees to radians
  * @param {number} deg
  */
-const degToRad = deg => deg / 180 * Math.PI;
+const _degToRad = deg => deg / 180 * Math.PI;
 
 /**
  * convert radians to degrees
  * @param {number} rad
  */
-const radToDeg = rad => rad * 180 / Math.PI;
+const _radToDeg = rad => rad * 180 / Math.PI;
 
 /**
  * set the width of the line
  * @param {number} w
  */
-function width(w) {
+const width = w => {
+    w = +w;
     turtle.width = w;
     _imageCtx.lineWidth = w;
-}
+};
 
 /**
- * write some text at the turtle position.
+ * write some text at the turtle position, with custom or default font.
  *
  * ideally we'd like this to rotate the text based on
  * the turtle orientation, but this will require some clever
  * canvas transformations which aren't implemented yet.
  * @param {string} msg
+ * @param {string} font
  */
-function write(msg) {
+const write = (msg, font) => {
     const {x, y} = turtle.pos;
 
     _imageCtx.save();
     _centerCoords(_imageCtx);
 
-    //imageContext.rotate(turtle.angle);
+    //_imageCtx.rotate(turtle.angle);
     _imageCtx.translate(x, y);
     _imageCtx.transform(1, 0, 0, -1, 0, 0);
     _imageCtx.translate(-x, -y);
+    _imageCtx.font = font;
     _imageCtx.fillText(msg, x, y);
     _imageCtx.restore();
 
     drawIf();
-}
+};
 
 /**
  * set the turtle draw shape
@@ -354,10 +361,10 @@ function write(msg) {
  * currently supports triangle (default), circle, square, and turtle
  * @param {string} s
  */
-function shape(s) {
+const shape = s => {
     turtle.shape = s;
     draw();
-}
+};
 
 /**
  * set background color using RGB values in the range 0 - 255.
@@ -369,7 +376,7 @@ function shape(s) {
  * @param {number} b
  * @param {number} a alpha
  */
-const bgColour = function(r, g, b, a) {
+const bgColour = (r, g, b, a) => {
     const {width: w, height: h} = _imageCanvas;
     _imageCtx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
     _imageCtx.fillRect(0, 0, w, h);
@@ -383,12 +390,18 @@ const bgColor = bgColour;
  * @param {number} b
  * @param {number} a alpha
  */
-const colour = function(r, g, b, a) {
+const colour = (r, g, b, a) => {
+    r = +r;
+    g = +g;
+    b = +b;
+    a = +a;
+
     _imageCtx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
-    turtle.colour.r = r;
-    turtle.colour.g = g;
-    turtle.colour.b = b;
-    turtle.colour.a = a;
+    const c = turtle.colour;
+    c.r = r;
+    c.g = g;
+    c.b = b;
+    c.a = a;
 };
 const color = colour;
 
@@ -397,16 +410,21 @@ const color = colour;
  * @param {number} min
  * @param {number} max
  */
-const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + +min);// `+` prevents string-concat from external users
+const random = (min, max) => {
+    min = +min;
+    max = +max;
+
+    return Math.floor(Math.random() * (max - min + 1) + min);
+};
 
 /**
  * @param {number} n
  * @param {Function} action
  */
-function repeat(n, action) {
-    for (let count = 1; count <= n; count++)
+const repeat = (n, action) => {
+    for (let count = 1; count <= +n; count++)
         action();
-}
+};
 
 /**
  * an alias of `setInterval`, but 2-adic (no rest args)
@@ -414,9 +432,6 @@ function repeat(n, action) {
  * @param {number | undefined} ms
  */
 const animate = (f, ms) => setInterval(f, ms);
-
-function setFont(/**@type {string}*/ font) { _imageCtx.font = font; }
-
 
 /**
  * main program/script, mostly UI code.
@@ -478,9 +493,9 @@ const _main = () => {
     /**@type {HTMLTextAreaElement}*/
     const def = doc.getElementById('definitions');
 
-    const runCommand = () => {
-        const commandText = cmdBox.value;
-        histAdd(commandText);
+    const runCmd = () => {
+        const cmdText = cmdBox.value;
+        histAdd(cmdText);
         histFlush();
 
         const definitionsText = def.value;
@@ -490,7 +505,7 @@ const _main = () => {
             // execute any code in the definitions box
             (0, eval)(definitionsText);
             // execute the code in the command box
-            (0, eval)(commandText);
+            (0, eval)(cmdText);
         } catch (e) {
             alert('Exception thrown:\n' + e);
             throw e;
@@ -501,8 +516,8 @@ const _main = () => {
     }
 
     // Execute the program in the command box when the user presses "Run" button or any "Enter" key
-    doc.getElementById('runButton').addEventListener('click', runCommand);
-    cmdBox.addEventListener('keydown', e => e.key == 'Enter' && runCommand());
+    doc.getElementById('runButton').addEventListener('click', runCmd);
+    cmdBox.addEventListener('keydown', e => e.key == 'Enter' && runCmd());
 
     doc.getElementById('resetButton').addEventListener('click', reset);
 
