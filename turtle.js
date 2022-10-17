@@ -493,6 +493,7 @@ const _main = () => {
         // Execute program in the command box when user presses any "Enter" or "Return" keys
         else if (key == 'Enter')   return runCmd();
         else                       return;
+        // fall-through
         cmdBox.value = cmdHist[cmdIdx] || '';
     }, false);
 
