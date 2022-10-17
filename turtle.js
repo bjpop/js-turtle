@@ -1,4 +1,3 @@
-//@ts-check
 'use strict';
 /*
 vars that should be private/local but are public/global, should be prefixed with `_`.
