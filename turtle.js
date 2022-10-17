@@ -366,13 +366,14 @@ function shape(s) {
  * @param {number} b
  * @param {number} a
  */
-function colour(r, g, b, a) { // should this have a `color` alias?
+const colour = function(r, g, b, a) {
     _imageCtx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
     turtle.colour.r = r;
     turtle.colour.g = g;
     turtle.colour.b = b;
     turtle.colour.a = a;
 }
+const color = colour // alias
 
 /**
  * Returns a pseudo-random integer in the range `min` <= n <= `max` (inclusive)
