@@ -68,7 +68,7 @@ let turtle = _defaultTurtle();
  * draw the turtle and the current image if `redraw` is `true`.
  * for complicated drawings it is much faster to turn `redraw` off.
 */
-function drawIf() { if (turtle.redraw) draw() }
+function drawIf() { turtle.redraw && draw(); }
 
 /**
  * use canvas centered coordinates facing upwards
@@ -211,7 +211,7 @@ function forward(distance) {
             distance = 0;
         };
         // if wrap is on, trace a part segment of the path and wrap on boundary if necessary
-        if (turtle.wrap) {
+        if (turtle.wrap)
             if (newX > maxX)
                 xWrap(maxX, minX);
             else if (newX < minX)
@@ -222,15 +222,12 @@ function forward(distance) {
                 yWrap(minY, maxY);
             else
                 noWrap();
-        }
         // wrap is not on.
-        else {
+        else
             noWrap();
-        }
     }
     // only draw if the pen is currently down.
-    if (turtle.penDown)
-        _imageCtx.stroke();
+    turtle.penDown && _imageCtx.stroke();
     _imageCtx.restore();
     drawIf();
 }
@@ -239,7 +236,7 @@ function forward(distance) {
  * turn edge wrapping on/off
  * @param {boolean} b
  */
-function wrap(b) { turtle.wrap = b }
+function wrap(b) { turtle.wrap = b; }
 
 function hideTurtle() {
     turtle.visible = false;
@@ -255,12 +252,12 @@ function showTurtle() {
  * turn on/off redrawing
  * @param {boolean} b
  */
-function redrawOnMove(b) { turtle.redraw = b }
+function redrawOnMove(b) { turtle.redraw = b; }
 
 /** lift up the pen (don't draw) */
-function penup() { turtle.penDown = false }
+function penup() { turtle.penDown = false; }
 /** put the pen down (do draw) */
-function pendown() { turtle.penDown = true }
+function pendown() { turtle.penDown = true; }
 
 /**
  * turn right by an angle in degrees
@@ -295,7 +292,7 @@ function goto(x, y) {
  * set the angle of the turtle in degrees
  * @param {number} angle
  */
-function angle(angle) { turtle.angle = degToRad(angle) }
+function angle(angle) { turtle.angle = degToRad(angle); }
 
 /**
  * Returns the sine and cosine of a number, as a 2-tuple.
@@ -397,7 +394,7 @@ function repeat(n, action) {
  */
 const animate = (f, ms) => setInterval(f, ms);
 
-function setFont(/**@type {string}*/ font) { _imageCtx.font = font }
+function setFont(/**@type {string}*/ font) { _imageCtx.font = font; }
 
 
 /**
@@ -486,7 +483,7 @@ const _main = () => {
 
     // Execute the program in the command box when the user presses "Run" button or any "Enter" key
     _doc.getElementById('runButton').addEventListener('click', runCommand);
-    cmdBox.addEventListener('keydown', e => { if (e.key == "Enter") runCommand() });
+    cmdBox.addEventListener('keydown', e => e.key == "Enter" && runCommand());
 
     _doc.getElementById('resetButton').addEventListener('click', reset);
 
