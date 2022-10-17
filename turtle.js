@@ -1,5 +1,5 @@
 'use strict';
-// vars that should be private/local but aren't, are prefixed with "_"
+// vars that should be private/local but aren't, are prefixed with `_`
 const _doc = document;
 
 // get a handle for each canvas in the document
@@ -7,8 +7,8 @@ const _doc = document;
 const _imageCanvas = _doc.getElementById('imagecanvas');
 const _imageCtx = _imageCanvas.getContext('2d');
 
-_imageCtx.textAlign = "center";
-_imageCtx.textBaseline = "middle";
+_imageCtx.textAlign = 'center';
+_imageCtx.textBaseline = 'middle';
 
 /**@type {CanvasRenderingContext2D}*/
 const _turtleCtx = _doc.getElementById('turtlecanvas').getContext('2d');
@@ -22,14 +22,14 @@ _turtleCtx.globalCompositeOperation = 'destination-over';
  * (The shapes are borrowed from cpython turtle.py)
  */
 const shapes = {
-    "triangle" : [[-5, 0], [5, 0], [0, 15]],
-    "turtle": [[0, 16], [-2, 14], [-1, 10], [-4, 7], [-7, 9],
+    triangle: [[-5, 0], [5, 0], [0, 15]],
+    turtle: [[0, 16], [-2, 14], [-1, 10], [-4, 7], [-7, 9],
                [-9, 8], [-6, 5], [-7, 1], [-5, -3], [-8, -6],
                [-6, -8], [-4, -5], [0, -7], [4, -5], [6, -8],
                [8, -6], [5, -3], [7, 1], [6, 5], [9, 8],
                [7, 9], [4, 7], [1, 10], [2, 14]],
-    "square": [[10, -10], [10, 10], [-10, 10], [-10, -10]],
-    "circle": [[10, 0], [9.51, 3.09], [8.09, 5.88],
+    square: [[10, -10], [10, 10], [-10, 10], [-10, -10]],
+    circle: [[10, 0], [9.51, 3.09], [8.09, 5.88],
                [5.88, 8.09], [3.09, 9.51], [0, 10],
                [-3.09, 9.51], [-5.88, 8.09], [-8.09, 5.88],
                [-9.51, 3.09], [-10, 0], [-9.51, -3.09],
@@ -38,7 +38,7 @@ const shapes = {
                [8.09, -5.88], [9.51, -3.09]]
 };
 
-const _DEFAULT_SHAPE = "triangle";
+const _DEFAULT_SHAPE = 'triangle';
 
 /** turtle-object constructor. For better "IntelliSense" and less code duplication */
 const _defaultTurtle = () => ({
@@ -114,7 +114,7 @@ function draw() {
         }
         _turtleCtx.closePath();
 
-        _turtleCtx.fillStyle = "green";
+        _turtleCtx.fillStyle = 'green';
         _turtleCtx.fill();
         _turtleCtx.restore();
     }
@@ -142,7 +142,7 @@ function reset() {
     // initialise
     turtle = _defaultTurtle();
     _imageCtx.lineWidth = turtle.width;
-    _imageCtx.strokeStyle = "black";
+    _imageCtx.strokeStyle = 'black';
     _imageCtx.globalAlpha = 1;
 
     clear();
@@ -423,7 +423,7 @@ const _main = () => {
     const histAdd = cmdTxt => {
         // queue, then set index to newest entry
         cmdIdx = cmdHist.push(cmdTxt);
-        // ensure it's up-to-date, to avoid "memory leaks"
+        // ensure it's up-to-date, to avoid memory leaks
         cmdHistSize += cmdTxt.length;
     };
 
@@ -445,14 +445,14 @@ const _main = () => {
     const cmdBox = _doc.getElementById('command');
 
     // Moves up and down in command history
-    cmdBox.addEventListener("keydown", e => {
-        if (e.key == "ArrowUp") {
+    cmdBox.addEventListener('keydown', ({ key }) => {
+        if (key == 'ArrowUp') {
             cmdIdx = Math.max(cmdIdx - 1, 0); // index must be unsigned
-            cmdBox.value = cmdHist[cmdIdx] || "";
+            cmdBox.value = cmdHist[cmdIdx] || '';
         }
-        if (e.key == "ArrowDown") {
+        if (key == 'ArrowDown') {
             cmdIdx = Math.min(cmdIdx + 1, cmdHist.length); // clamp
-            cmdBox.value = cmdHist[cmdIdx] || "";
+            cmdBox.value = cmdHist[cmdIdx] || '';
         }
     }, false);
 
@@ -483,7 +483,7 @@ const _main = () => {
 
     // Execute the program in the command box when the user presses "Run" button or any "Enter" key
     _doc.getElementById('runButton').addEventListener('click', runCommand);
-    cmdBox.addEventListener('keydown', e => e.key == "Enter" && runCommand());
+    cmdBox.addEventListener('keydown', e => e.key == 'Enter' && runCommand());
 
     _doc.getElementById('resetButton').addEventListener('click', reset);
 
