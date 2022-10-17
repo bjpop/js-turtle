@@ -409,7 +409,7 @@ const _main = () => {
     // we could use OOP to gather all of this `hist` logic in a single object... (to-do)
 
     /** to navigate command history (a queue) */
-    const cmddHist = [];
+    const cmdHist = [];
     /** current hist index */
     let cmdIdx = 0;
     /**
@@ -425,7 +425,7 @@ const _main = () => {
      */
     const histAdd = cmdTxt => {
         // queue, then set index to newest entry
-        cmdIdx = cmddHist.push(cmdTxt);
+        cmdIdx = cmdHist.push(cmdTxt);
         // ensure it's up-to-date, to avoid "memory leaks"
         cmdHistSize += cmdTxt.length;
     };
@@ -439,7 +439,7 @@ const _main = () => {
         const HIST_SIZE_LIMIT = 1 << 20;
         while (cmdHistSize > HIST_SIZE_LIMIT) {
             // dequeue, then update size
-            cmdHistSize -= cmddHist.shift().length;
+            cmdHistSize -= cmdHist.shift().length;
             cmdIdx--; // index correction
         }
     };
@@ -451,11 +451,11 @@ const _main = () => {
     cmdBox.addEventListener("keydown", e => {
         if (e.key == "ArrowUp") {
             cmdIdx = Math.max(cmdIdx - 1, 0); // index must be unsigned
-            cmdBox.value = cmddHist[cmdIdx] || "";
+            cmdBox.value = cmdHist[cmdIdx] || "";
         }
         if (e.key == "ArrowDown") {
-            cmdIdx = Math.min(cmdIdx + 1, cmddHist.length); // clamp
-            cmdBox.value = cmddHist[cmdIdx] || "";
+            cmdIdx = Math.min(cmdIdx + 1, cmdHist.length); // clamp
+            cmdBox.value = cmdHist[cmdIdx] || "";
         }
     }, false);
 
