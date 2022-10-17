@@ -444,48 +444,60 @@ const animate = (f, ms) => setInterval(f, ms);
 const _main = () => {
     const doc = document;
 
-    // simplify history API
+    /** String Queue (FIFO) to manage a history or log */
     const History = class {
-        constructor(maxLen = 1 << 16) {
-            this.maxLen = maxLen;
+        constructor(maxSize = 1 << 16) {
+            /**
+             * total size in memory.
+             * measured in **code-units** (16b or 2B), not bytes (8b or 1B).
+             */
+            this.size = 0;
+            /** max CUs to store until a cmd is cleared from history queue */
+            this.maxSize = maxSize;
+            /**@type {string[]}*/
+            this.entries = [];
+            /** pointer to currently selected entry */
+            this.index = 0;
+        }
+
+        /** returns entry at `index`, defaulting to empty `string` */
+        get() { return this.entries[this.index] || '' }
+
+        /** get latest entry */
+        newest() { return this.entries[this.entries.length - 1] } // not using `at`, for compatibility
+        /** get earliest entry */
+        oldest() { return this.entries[0] }
+
+        /**
+         * append/push, with auto-flush
+         * @param {string} s
+         */
+        set(s) {
+            // queue, then set index to newest entry
+            this.index = this.entries.push(s);
+            // ensure it's up-to-date, to avoid memory leaks
+            this.size += s.length;
+
+            // flush old entries
+            while (this.size > this.maxSize) {
+                // dequeue, then update size
+                this.size -= this.entries.shift().length;
+                this.index--; // index correction
+            }
+        }
+
+        /** increment `index` by 1, clamped to `entries.length` */
+        incIdx() {
+            this.index = Math.min(this.index + 1, this.entries.length);
+        }
+
+        /** decrement `index` by 1, clamped to 0 (keep it unsigned) */
+        decIdx() {
+            this.index = Math.max(this.index - 1, 0);
         }
     };
 
-    /** to navigate command history (a queue) */
-    const cmdHist = [];
-    /** current hist index */
-    let cmdIdx = 0;
-    /**
-     * total size of the history in memory.
-     *
-     * for performance, it's measured in **code-units** (16b or 2B), not bytes (8b or 1B).
-     */
-    let cmdHistSize = 0;
-
-    /**
-     * append command to history
-     * @param {string} cmdTxt
-     */
-    const histAdd = cmdTxt => {
-        // queue, then set index to newest entry
-        cmdIdx = cmdHist.push(cmdTxt);
-        // ensure it's up-to-date, to avoid memory leaks
-        cmdHistSize += cmdTxt.length;
-    };
-
-    /**
-     * removes old history entries until memory-use is lower.
-     * essentially, explicit garbage collection.
-     */
-    const histFlush = () => {
-        /** max CUs to store until a cmd is cleared from history queue */
-        const HIST_SIZE_LIMIT = 1 << 20;
-        while (cmdHistSize > HIST_SIZE_LIMIT) {
-            // dequeue, then update size
-            cmdHistSize -= cmdHist.shift().length;
-            cmdIdx--; // index correction
-        }
-    };
+    const cmds = new History(1 << 20);
 
     /**@type {HTMLInputElement}*/
     const cmdBox = doc.getElementById('command');
@@ -493,20 +505,14 @@ const _main = () => {
     cmdBox.addEventListener('keydown', ({ key }) => {
         switch (key) {
             // Moves up and down in command history
-            case 'ArrowDown':
-                cmdIdx = Math.min(cmdIdx + 1, cmdHist.length); // clamp
-                break;
-            case 'ArrowUp':
-                cmdIdx = Math.max(cmdIdx - 1, 0); // index must be unsigned
-                break;
+            case 'ArrowDown': cmds.incIdx(); break;
+            case 'ArrowUp': cmds.decIdx(); break;
             // Execute program in the command box when user presses any "Enter" or "Return" keys
-            case 'Enter':
-                return runCmd();
-            default:
-                return;
+            case 'Enter': return runCmd();
+            default: return;
         }
         // external fall-through, only executed if `return` isn't touched
-        cmdBox.value = cmdHist[cmdIdx] || '';
+        cmdBox.value = cmds.get();
     }, false);
 
     /**@type {HTMLTextAreaElement}*/
@@ -514,8 +520,7 @@ const _main = () => {
 
     const runCmd = () => {
         const cmdText = cmdBox.value;
-        histAdd(cmdText);
-        histFlush();
+        cmds.set(cmdText);
 
         const definitionsText = def.value;
         // https://stackoverflow.com/questions/19357978/indirect-eval-call-in-strict-mode
