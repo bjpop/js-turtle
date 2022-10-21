@@ -1,6 +1,6 @@
 'use strict';
 /*
-vars that should be private/local but are public/global, should be prefixed with `_`.
+vars that should be private/local but are public/global, must be prefixed with `_`.
 
 public API (for the user) fns should sanitize their inputs, usually via unary-plus `+`.
 */
@@ -164,6 +164,8 @@ const reset = () => {
  * @param {number} distance
  */
 const forward = distance => {
+    distance = +distance;
+
     _imageCtx.save();
     _centerCoords(_imageCtx);
     _imageCtx.beginPath();
@@ -443,29 +445,57 @@ const animate = (f, ms) => setInterval(f, ms);
 const _main = () => {
     const doc = document;
 
-    /** String Queue (FIFO) to manage a history or log */
+    /**
+     * check if value is of type `number`, and an unsigned 32bit integer
+     * @param {*} x value to check
+    */
+    const is_u32 = x => typeof x == 'number' && x == (x >>> 0);
+
+    /**
+     * String Queue (FIFO) to manage a history or log.
+     * @param {number} [maxSize=2**16] `Uint32`. maximum chars to keep in memory.
+     */
     const History = class {
-        constructor(maxSize = 1 << 16) {
-            /**
-             * total size in memory.
-             * measured in **code-units** (16b or 2B), not bytes (8b or 1B).
-             */
-            this.size = 0;
-            /** max CUs to store until a cmd is cleared from history queue */
-            this.maxSize = maxSize;
-            /**@type {string[]}*/
-            this.entries = [];
-            /** pointer to currently selected entry */
-            this.index = 0;
+        /**
+         * total size in memory.
+         * measured in **code-units** (16b or 2B), not bytes (8b or 1B).
+         * @type {number} `Uint32`
+         */
+        #size
+
+        /**
+         * max CUs to store, until at least 1 string is cleared from the queue.
+         * @type {number} `Uint32`
+        */
+        #maxSize
+
+        /**
+         * pointer to currently selected entry.
+         * @type {number} `Uint32`
+         */
+        #index
+
+        /**@type {string[]}*/
+        #entries
+
+        // a 16bit address-space seems like a sensible default
+        constructor(maxSize = 1 << 0x10) {
+            if ( !is_u32(maxSize) )
+                throw new RangeError('expected `maxSize` to be `Uint32`, but got ' + maxSize);
+
+            this.#maxSize = maxSize;
+            this.#index = this.#size = 0;
+            this.#entries = [];
         }
 
-        /** returns entry at `index`, defaulting to empty `string` */
-        get() { return this.entries[this.index] || '' }
+        /** returns entry at current `index`, defaulting to empty `string` */
+        get() { return this.#entries[this.#index] || '' }
 
+        // both are unused, but may be handy in the future
         /** get latest entry */
-        newest() { return this.entries[this.entries.length - 1] } // not using `at`, for compatibility
+        newest() { return this.#entries[this.#entries.length - 1] } // not using `at`, for compatibility
         /** get earliest entry */
-        oldest() { return this.entries[0] }
+        oldest() { return this.#entries[0] }
 
         /**
          * append/push, with auto-flush
@@ -473,26 +503,37 @@ const _main = () => {
          */
         set(s) {
             // queue, then set index to newest entry
-            this.index = this.entries.push(s);
+            this.#index = this.#entries.push(s);
             // ensure it's up-to-date, to avoid memory leaks
-            this.size += s.length;
+            this.#size += s.length;
 
             // flush old entries
-            while (this.size > this.maxSize) {
+            while (this.#size > this.#maxSize) {
                 // dequeue, then update size
-                this.size -= this.entries.shift().length;
-                this.index--; // index correction
+                this.#size -= this.#entries.shift().length;
+                this.#index--; // index correction
             }
         }
 
-        /** increment `index` by 1, clamped to `entries.length` */
+        /** increment `index` by 1, clamped to `entries.length`, then return its value */
         incIdx() {
-            this.index = Math.min(this.index + 1, this.entries.length);
+            return this.#index = Math.min(this.#index + 1, this.#entries.length);
         }
 
-        /** decrement `index` by 1, clamped to 0 (keep it unsigned) */
+        /** decrement `index` by 1, clamped to 0 (keeps it unsigned), then return its value */
         decIdx() {
-            this.index = Math.max(this.index - 1, 0);
+            return this.#index = Math.max(this.#index - 1, 0);
+        }
+
+        // also unused, but good to have available
+        /**
+         * set `maxSize` to a new value
+         * @param {number} n `Uint32`
+        */
+        setMaxSize(n) {
+            if ( !is_u32(n) )
+                throw new RangeError('expected `n` to be `Uint32`, but got ' + n);
+            this.#maxSize = n;
         }
     };
 
@@ -506,7 +547,7 @@ const _main = () => {
             // Moves up and down in command history
             case 'ArrowDown': cmds.incIdx(); break;
             case 'ArrowUp': cmds.decIdx(); break;
-            // Execute program in the command box when user presses any "Enter" or "Return" keys
+            // call `runCmd` when user presses any "Enter" or "Return" keys
             case 'Enter': return runCmd();
             default: return;
         }
@@ -517,6 +558,7 @@ const _main = () => {
     /**@type {HTMLTextAreaElement}*/
     const def = doc.getElementById('definitions');
 
+    /** Executes program in the command box */
     const runCmd = () => {
         const cmdText = cmdBox.value;
         cmds.set(cmdText);
@@ -544,7 +586,7 @@ const _main = () => {
      * @param {(this: HTMLElement, ev: MouseEvent) => any} cb callback
      */
     const listenClickById = (id, cb) => doc.getElementById(id).addEventListener('click', cb);
-    // Execute program in the command box when user presses "Run"
+    // call `runCmd` when user presses "Run"
     listenClickById('runButton', runCmd);
     listenClickById('resetButton', reset);
     reset();
