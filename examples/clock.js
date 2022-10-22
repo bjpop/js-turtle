@@ -64,16 +64,16 @@ function hand (theta, w, length, col) {
 
 // draw all of the hands
 function hands(hours, minutes, seconds) {
-    // draw seconds hand
-    hand(seconds * 6, 6, 100, {r: 255, g: 0, b: 0, a: 0.5 });
-    // draw minutes hand
-    const minutesInSeconds = minutes * 60;
-    const minutesAndSeconds = minutesInSeconds + seconds;
-    hand(minutesAndSeconds * 0.1, 10, 100, {r: 0, g: 255, b: 0, a: 0.5 });
-    // draw hours hand
-    const hoursInSeconds = hours % 12 * 3600;
-    const hoursAndMinutesAndSeconds = hoursInSeconds + minutesAndSeconds;
-    hand(hoursAndMinutesAndSeconds * 360 / 43200, 10, 60, {r: 0, g: 0, b: 255, a: 0.5 });
+   // draw seconds hand
+   hand(seconds * 6, 6, 100, {r: 255, g: 0, b: 0, a: 0.5 });
+   // draw minutes hand
+   const minutesInSeconds = minutes * 60;
+   const minutesAndSeconds = minutesInSeconds + seconds;
+   hand(minutesAndSeconds * 0.1, 10, 100, {r: 0, g: 255, b: 0, a: 0.5 });
+   // draw hours hand
+   const hoursInSeconds = hours % 12 * 3600;
+   const hoursAndMinutesAndSeconds = hoursInSeconds + minutesAndSeconds;
+   hand(hoursAndMinutesAndSeconds * 360 / 43200, 10, 60, {r: 0, g: 0, b: 255, a: 0.5 });
 }
 
 // refresh the entire clock

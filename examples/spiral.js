@@ -2,7 +2,7 @@
 
 function spiral(steps, angle) {
    const widthInc = 5 / steps;
-   const w = 0.1;
+   let w = 0.1;
    while (steps-- > 0) {
       width(w);
       forward(random(1,10));

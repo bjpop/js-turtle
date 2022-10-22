@@ -1,0 +1,27 @@
+env:
+  browser: true
+  es2021: true
+extends: eslint:recommended
+overrides: []
+parserOptions:
+  # unfortunately, private class members aren't compatible with ES6
+  ecmaVersion: 13 # min
+rules: # `warn`` instead of `error`, for easier transition
+  indent:
+    - warn
+    - 3
+    - SwitchCase: 1
+  linebreak-style:
+    - warn
+    - unix # reason: less bytes
+  quotes:
+    - warn
+    - single # reason: it seems these are used more frequently in *.js files
+  semi:
+    - warn
+    - always
+  no-unused-vars:
+    - warn
+    - vars: local # reason for no `global`: no need to explain
+  no-undef:
+    - warn # reason for no `error``: examples

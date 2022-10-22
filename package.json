@@ -1,0 +1,25 @@
+{
+  "name": "js-turtle",
+  "version": "0.1.0",
+  "description": "Turtle graphics in Javascript using HTML5 canvas",
+  "main": "turtle.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bjpop/js-turtle.git"
+  },
+  "author": "bjpop",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/bjpop/js-turtle/issues"
+  },
+  "homepage": "https://github.com/bjpop/js-turtle#readme",
+  "devDependencies": {
+    "eslint": "^8.26.0"
+  }
+}
