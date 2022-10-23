@@ -4,8 +4,7 @@ env:
 extends: eslint:recommended
 overrides: []
 parserOptions:
-  # unfortunately, private class members aren't compatible with ES6
-  ecmaVersion: 13 # min
+  ecmaVersion: 6 # min
 rules: # `warn`` instead of `error`, for easier transition
   indent:
     - warn

@@ -1,4 +1,10 @@
 'use strict';
+/**
+ * @typedef {number} Uint32
+ * An integer in the range 0 <= n < 2^32.
+ * AKA unsigned (non-negative) 32bit integer.
+ */
+
 /*
 vars that should be private/local but are public/global, must be prefixed with `_`.
 
@@ -454,49 +460,45 @@ const _main = () => {
 
    /**
     * String Queue (FIFO) to manage a history or log.
-    * @param {number} [maxSize=2**16] `Uint32`. maximum chars to keep in memory.
+    * @param {Uint32} [maxSize=2**16] maximum chars to keep in memory.
     */
    const History = class {
-      /**
-       * total size in memory.
-       * measured in **code-units** (16b or 2B), not bytes (8b or 1B).
-       * @type {number} `Uint32`
-       */
-      #size;
-
-      /**
-       * max CUs to store, until at least 1 string is cleared from the queue.
-       * @type {number} `Uint32`
-      */
-      #maxSize;
-
-      /**
-       * pointer to currently selected entry.
-       * @type {number} `Uint32`
-       */
-      #index;
-
-      /**@type {string[]}*/
-      #entries;
-
       // a 16bit address-space seems like a sensible default
       constructor(maxSize = 1 << 0x10) {
          if ( !is_u32(maxSize) )
             throw new RangeError('expected `maxSize` to be `Uint32`, but got ' + maxSize);
 
-         this.#maxSize = maxSize;
-         this.#index = this.#size = 0;
-         this.#entries = [];
+         /**
+          * max CUs to store, until at least 1 string is cleared from the queue.
+          * @type {Uint32}
+          */
+         this._maxSize = maxSize;
+
+         /**
+          * total size in memory.
+          * measured in **code-units** (16b or 2B), not bytes (8b or 1B).
+          * @type {Uint32}
+          */
+         this._size = 0;
+
+         /**
+          * pointer to currently selected entry.
+          * @type {Uint32}
+          */
+         this._index = 0;
+
+         /**@type {string[]}*/
+         this._entries = [];
       }
 
       /** returns entry at current `index`, defaulting to empty `string` */
-      get() { return this.#entries[this.#index] || ''; }
+      get() { return this._entries[this._index] || ''; }
 
       // both are unused, but may be handy in the future
       /** get latest entry */
-      newest() { return this.#entries[this.#entries.length - 1]; } // not using `at`, for compatibility
+      newest() { return this._entries[this._entries.length - 1]; } // not using `at`, for compatibility
       /** get earliest entry */
-      oldest() { return this.#entries[0]; }
+      oldest() { return this._entries[0]; }
 
       /**
        * append/push, with auto-flush
@@ -504,37 +506,43 @@ const _main = () => {
        */
       set(s) {
          // queue, then set index to newest entry
-         this.#index = this.#entries.push(s);
+         this._index = this._entries.push(s);
          // ensure it's up-to-date, to avoid memory leaks
-         this.#size += s.length;
+         this._size += s.length;
 
          // flush old entries
-         while (this.#size > this.#maxSize) {
+         while (this._size > this._maxSize) {
             // dequeue, then update size
-            this.#size -= this.#entries.shift().length;
-            this.#index--; // index correction
+            this._size -= this._entries.shift().length;
+            this._index--; // index correction
          }
       }
 
-      /** increment `index` by 1, clamped to `entries.length`, then return its value */
+      /**
+       * increment `index` by 1, clamped to `entries.length`, then return its value.
+       * @return {Uint32}
+       */
       incIdx() {
-         return this.#index = Math.min(this.#index + 1, this.#entries.length);
+         return this._index = Math.min(this._index + 1, this._entries.length);
       }
 
-      /** decrement `index` by 1, clamped to 0 (keeps it unsigned), then return its value */
+      /**
+       * decrement `index` by 1, clamped to 0 (keeps it unsigned), then return its value.
+       * @return {Uint32}
+       */
       decIdx() {
-         return this.#index = Math.max(this.#index - 1, 0);
+         return this._index = Math.max(this._index - 1, 0);
       }
 
       // also unused, but good to have available
       /**
        * set `maxSize` to a new value
-       * @param {number} n `Uint32`
+       * @param {Uint32} n
       */
       setMaxSize(n) {
          if ( !is_u32(n) )
             throw new RangeError('expected `n` to be `Uint32`, but got ' + n);
-         this.#maxSize = n;
+         this._maxSize = n;
       }
    };
 
