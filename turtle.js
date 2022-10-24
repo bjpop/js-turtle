@@ -3,6 +3,8 @@
  * @typedef {number} Uint32
  * An integer in the range 0 <= n < 2^32.
  * AKA unsigned (non-negative) 32bit integer.
+ *
+ * Name influenced by `Uint32Array`.
  */
 
 /*
@@ -453,10 +455,19 @@ const _main = () => {
    const doc = document;
 
    /**
-    * check if value is of type `number`, and an unsigned 32bit integer
-    * @param {*} x value to check
+    * check if `x` is `-0`, using only operators.
+    * to ensure correctness in ALL circumstances, it doesn't use `Object.is`, because it's mutable.
+    * this means this fn is 100% [pure](https://en.wikipedia.org/wiki/Pure_function).
+    * @param {*} x
+    */
+   const isNegZero = x => typeof x == 'number' && x == 0 && 1 / x == -Infinity;
+
+   /**
+    * check if `x` matches the description of the `Uint32` namepath.
+    * this fn is pure, by using only operators (and a fn call).
+    * @param {*} x
    */
-   const is_u32 = x => typeof x == 'number' && x == (x >>> 0);
+   const isUint32 = x => typeof x == 'number' && x == x >>> 0 && !isNegZero(x);
 
    /**
     * String Queue (FIFO) to manage a history or log.
@@ -465,7 +476,7 @@ const _main = () => {
    const History = class {
       // a 16bit address-space seems like a sensible default
       constructor(maxSize = 1 << 0x10) {
-         if ( !is_u32(maxSize) )
+         if ( !isUint32(maxSize) )
             throw new RangeError('expected `maxSize` to be `Uint32`, but got ' + maxSize);
 
          /**
@@ -540,7 +551,7 @@ const _main = () => {
        * @param {Uint32} n
       */
       setMaxSize(n) {
-         if ( !is_u32(n) )
+         if ( !isUint32(n) )
             throw new RangeError('expected `n` to be `Uint32`, but got ' + n);
          this._maxSize = n;
       }
