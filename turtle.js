@@ -8,9 +8,9 @@
  */
 
 /*
-vars that should be private/local but are public/global, must be prefixed with `_`.
+vars that should be private/local but are public/global, are prefixed with `_`.
 
-public API (for the user) fns should sanitize their inputs, usually via unary-plus `+`.
+fns that sanitize their inputs (despite JSDoc type annotations) are "very public" API.
 */
 
 // get a handle for each canvas in the document
@@ -421,9 +421,9 @@ const colour = (r, g, b, a) => {
 const color = colour;
 
 /**
- * Returns a pseudo-random integer in the range `min` <= n <= `max` (inclusive)
- * @param {number} min
- * @param {number} max
+ * Returns a pseudo-random integer in a range
+ * @param {number} min inclusive lower bound
+ * @param {number} max inclusive upper bound
  */
 const random = (min, max) => {
    min = +min;
@@ -434,8 +434,8 @@ const random = (min, max) => {
 
 /**
  * repeatedly run an "action" callback `n` times
- * @param {number} n (integer)
- * @param {Function} action (callback)
+ * @param {number} n integer
+ * @param {() => *} action callback
  */
 const repeat = (n, action) => { while (n-- > 0) action(); };
 
@@ -506,14 +506,14 @@ const _main = () => {
          this._entries = [];
       }
 
-      /** returns entry at current `index`, defaulting to empty `string` */
+      /** returns entry at current `index`, defaults to empty `string` */
       get() { return this._entries[this._index] || ''; }
 
       // both are unused, but may be handy in the future
-      /** get latest entry */
-      newest() { return this._entries[this._entries.length - 1]; } // not using `at`, for compatibility
-      /** get earliest entry */
-      oldest() { return this._entries[0]; }
+      /** get latest entry, defaults to empty `string` */
+      newest() { return this._entries[this._entries.length - 1] || ''; }
+      /** get earliest entry, defaults to empty `string` */
+      oldest() { return this._entries[0] || ''; }
 
       /**
        * append/push, with auto-flush
@@ -559,9 +559,10 @@ const _main = () => {
             throw new RangeError('expected `n` to be `Uint32`, but got ' + n);
          this._maxSize = n;
       }
+      // maybe we should add a button to clear the history?
    };
 
-   const cmds = new History(1 << 20);
+   const cmds = new History(1 << 20); // is this size "balanced"?
 
    /**@type {HTMLInputElement}*/
    const cmdBox = doc.getElementById('command');
