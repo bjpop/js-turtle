@@ -1,10 +1,7 @@
 env:
   browser: true
-  es2021: true
+  es6: true # retro-compatibility
 extends: eslint:recommended
-overrides: []
-parserOptions:
-  ecmaVersion: 6 # min
 rules: # `warn`` instead of `error`, for easier transition
   indent:
     - warn
@@ -21,6 +18,4 @@ rules: # `warn`` instead of `error`, for easier transition
     - always
   no-unused-vars:
     - warn
-    - vars: local # reason for no `global`: no need to explain
-  no-undef:
-    - warn # reason for no `error``: examples
+    - vars: local

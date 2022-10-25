@@ -476,8 +476,12 @@ const _main = () => {
    const History = class {
       // a 16bit address-space seems like a sensible default
       constructor(maxSize = 1 << 0x10) {
+         // runtime type safety
          if ( !isUint32(maxSize) )
             throw new RangeError('expected `maxSize` to be `Uint32`, but got ' + maxSize);
+         // just-in-case
+         if (maxSize < 2)
+            console.warn('Max History size set to 0 or 1. This seems like an accident');
 
          /**
           * max CUs to store, until at least 1 string is cleared from the queue.
