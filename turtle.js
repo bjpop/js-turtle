@@ -460,7 +460,7 @@ const _main = () => {
     * this means this fn is 100% [pure](https://en.wikipedia.org/wiki/Pure_function).
     * @param {*} x
     */
-   const isNegZero = x => typeof x == 'number' && x == 0 && 1 / x == -Infinity;
+   const isNegZero = x => x === 0 && 1 / x == -Infinity;
 
    /**
     * check if `x` matches the description of the `Uint32` namepath.
