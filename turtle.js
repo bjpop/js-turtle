@@ -2,7 +2,7 @@
 /**
  * @typedef {number} Uint32
  * An integer in the range 0 <= n < 2^32.
- * AKA unsigned (non-negative) 32bit integer.
+ * AKA unsigned (non-negative) 32bit int.
  *
  * Name influenced by `Uint32Array`.
  */
