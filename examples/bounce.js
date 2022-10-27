@@ -1,25 +1,20 @@
 // rectangles which bounce off the side of the canvas
 
-function init_drops(n) {
-   const drops = [];
-   while (n-- > 0) drops.push({
-      x: random(-150, 150),
-      y: random(-150, 150),
+const init_drops = n => Array(n).fill().map(() => ({
+   x: random(-150, 150),
+   y: random(-150, 150),
 
-      velocityX: random(-6, 6),
-      velocityY: random(-6, 6),
+   velocityX: random(-6, 6),
+   velocityY: random(-6, 6),
 
-      size: random(20, 300),
-      width: random(1, 40),
+   size: random(20, 300),
+   width: random(1, 40),
 
-      r: random(0, 255),
-      g: random(0, 255),
-      b: random(0, 255),
-      a: Math.random()
-   });
-
-   return drops;
-}
+   r: random(0, 255),
+   g: random(0, 255),
+   b: random(0, 255),
+   a: Math.random()
+}));
 
 function rain(drops) {
    clear();
