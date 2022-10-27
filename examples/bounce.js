@@ -1,6 +1,6 @@
 // rectangles which bounce off the side of the canvas
 
-const init_drops = n => Array(n).fill().map(() => ({
+const init_drops = length => Array.from({ length }, () => ({
    x: random(-150, 150),
    y: random(-150, 150),
 
