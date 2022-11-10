@@ -473,7 +473,7 @@ const _main = () => {
     * String Queue (FIFO) to manage a history or log.
     * @param {Uint32} [maxSize=2**16] maximum chars to keep in memory.
     */
-   const History = class {
+   const Hist = class {
       // a 16bit address-space seems like a sensible default
       constructor(maxSize = 1 << 0x10) {
          // runtime type safety
@@ -562,7 +562,7 @@ const _main = () => {
       // maybe we should add a button to clear the history?
    };
 
-   const cmds = new History(1 << 20); // is this size "balanced"?
+   const cmds = new Hist(1 << 20); // is this size "balanced"?
 
    /**@type {HTMLInputElement}*/
    const cmdBox = doc.getElementById('command');
