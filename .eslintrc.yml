@@ -5,7 +5,7 @@ extends: eslint:recommended
 rules: # `warn`` instead of `error`, for easier transition
   indent:
     - warn
-    - 3
+    - 3 # average between 2 and 4
     - SwitchCase: 1
   linebreak-style:
     - warn
@@ -16,6 +16,14 @@ rules: # `warn`` instead of `error`, for easier transition
   semi:
     - warn
     - always
+  no-self-compare: error
+  no-constant-binary-expression: error
+  no-unreachable-loop: error
   no-unused-vars:
     - warn
     - vars: local
+  no-unused-private-class-members: warn
+  no-shadow:
+    - warn
+    - builtinGlobals: true
+  no-constructor-return: warn
