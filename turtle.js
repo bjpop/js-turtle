@@ -382,23 +382,6 @@ const shape = s => {
 };
 
 /**
- * set background color using RGB values in the range 0 - 255.
- *
- * currently, this has the unintended effect of wiping the entire canvas.
- * (to-do: fix later)
- * @param {number} r
- * @param {number} g
- * @param {number} b
- * @param {number} a alpha
- */
-const bgColour = (r, g, b, a) => {
-   const {width: w, height: h} = _imageCanvas;
-   _imageCtx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
-   _imageCtx.fillRect(0, 0, w, h);
-};
-const bgColor = bgColour;
-
-/**
  * set line color using RGB values in the range 0 - 255.
  * @param {number} r
  * @param {number} g
