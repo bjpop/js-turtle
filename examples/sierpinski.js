@@ -24,14 +24,12 @@ function halfSierpinski(size, level) {
 
 /** draw a Sierpinski Curve of arbitrary recursive depth */
 function sierpinski(size, level) {
-   function half() {
+   for (let _=0; _<2; _++) {
       halfSierpinski(size, level);
       right(90);
       forward(size);
       right(90);
    }
-   half();
-   half();
 }
 
 function demo() {
