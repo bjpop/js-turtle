@@ -6,14 +6,13 @@ function ticks(radius) {
    width(1);
    for (let theta = 0; theta < 360; theta += 6) {
       // skip the mark where the numbers are drawn
-      if (theta % 30 != 0) {
-         penup();
-         goto(0,0);
-         angle(theta);
-         forward(gap);
-         pendown();
-         forward(tickLen);
-      }
+      if (theta % 30 == 0) continue;
+      penup();
+      goto(0,0);
+      angle(theta);
+      forward(gap);
+      pendown();
+      forward(tickLen);
    }
 }
 
@@ -29,7 +28,7 @@ function circle(x, y, w, radius, sides) {
    pendown();
    colour(0, 255, 0, 0.5);
    width(w);
-   for (let n = 0; n < sides; n++) {
+   while (sides-- > 0) {
       forward(sideLen);
       right(theta);
    }
