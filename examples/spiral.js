@@ -13,19 +13,15 @@ function spiral(steps, angle) {
 
 function fun(count) {
    while (count-- > 0) {
-      const
-         r = random(0,255),
-         g = random(0,255),
-         b = random(0,255),
-         a = Math.random();
-      colour(r,g,b,a);
-      const
-         x = random(-150,150),
-         y = random(-150, 150);
-      goto(x,y);
-      const theta = random(0,360);
-      angle(theta);
-      spiral(random(100,1000), random(5,90));
+      colour(
+         random(0,255),
+         random(0,255),
+         random(0,255),
+         Math.random()
+      );
+      goto(random(-150, 150), random(-150, 150));
+      angle(random(0,360));
+      spiral(random(100, 1000), random(5, 90));
    }
 }
 
