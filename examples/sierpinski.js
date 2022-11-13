@@ -22,12 +22,12 @@ function halfSierpinski(size, level) {
 
 /** draw a Sierpinski Curve of arbitrary recursive depth */
 function sierpinski(size, level) {
-   function part() {
+   const part = () => {
       halfSierpinski(size, level);
       right(90);
       forward(size);
       right(90);
-   }
+   };
    part();
    part();
 }
