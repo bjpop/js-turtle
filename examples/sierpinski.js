@@ -4,21 +4,20 @@
 function halfSierpinski(size, level) {
    if (level <= 0) {
       forward(size);
+      return;
    }
-   else {
-      const part = () => {
-         halfSierpinski(size, level - 1);
-         left(45);
-         forward(size * Math.SQRT2);
-         left(45);
-         halfSierpinski(size, level - 1);
-      };
-      part();
-      right(90);
-      forward(size);
-      right(90);
-      part();
-   }
+   const part = () => {
+      halfSierpinski(size, level - 1);
+      left(45);
+      forward(size * Math.SQRT2);
+      left(45);
+      halfSierpinski(size, level - 1);
+   };
+   part();
+   right(90);
+   forward(size);
+   right(90);
+   part();
 }
 
 /** draw a Sierpinski Curve of arbitrary recursive depth */
