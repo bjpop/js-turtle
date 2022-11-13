@@ -1,9 +1,10 @@
-// draw a Sierpinski Curve of arbitrary recursive depth
 // https://en.wikipedia.org/wiki/Sierpi%C5%84ski_curve
 
+/** helper for `sierpinski` */
 function halfSierpinski(size, level) {
-   if (level <= 0)
+   if (level <= 0) {
       forward(size);
+   }
    else {
       const part = () => {
          halfSierpinski(size, level - 1);
@@ -20,6 +21,7 @@ function halfSierpinski(size, level) {
    }
 }
 
+/** draw a Sierpinski Curve of arbitrary recursive depth */
 function sierpinski(size, level) {
    function part() {
       halfSierpinski(size, level);
