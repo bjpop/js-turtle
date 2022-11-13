@@ -1,4 +1,5 @@
-// draw a Sierpinski Triangle of arbitrary recursive depth
+// draw a Sierpinski Curve of arbitrary recursive depth
+// https://en.wikipedia.org/wiki/Sierpi%C5%84ski_curve
 
 function halfSierpinski(size, level) {
    if (level <= 0)
