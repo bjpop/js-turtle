@@ -4,8 +4,20 @@
  * An integer in the range 0 <= n < 2^32.
  * AKA unsigned (non-negative) 32bit int.
  *
- * Name influenced by `Uint32Array`.
+ * Name influenced by {@link Uint32Array}.
  */
+
+/**
+ * Yield a sequence of ints in the interval `[start, end(`.
+ * Doesn't handle unsafe (overflowing) numbers, so it'll get stuck at {@link Number.MAX_SAFE_INTEGER}.
+ * @param {number} start
+ * @param {number} end
+ */
+const range = function*(start, end, step=1) {
+   for (let i = +start; i < +end; i += +step){
+      yield i;
+   }
+};
 
 /*
 vars that should be private/local but are public/global, are prefixed with `_`.
@@ -14,15 +26,16 @@ fns that sanitize their inputs (despite JSDoc type annotations) are "very public
 */
 
 // get a handle for each canvas in the document
-/**@type {HTMLCanvasElement}*/
-const _imageCanvas = document.getElementById('imagecanvas');
-const _imageCtx = _imageCanvas.getContext('2d');
+const _imageCanvas = /**@type {HTMLCanvasElement}*/(document.getElementById('imagecanvas'));
+const _imageCtx = /**@type {CanvasRenderingContext2D}*/(_imageCanvas.getContext('2d'));
 
 _imageCtx.textAlign = 'center';
 _imageCtx.textBaseline = 'middle';
 
-/**@type {CanvasRenderingContext2D}*/
-const _turtleCtx = document.getElementById('turtlecanvas').getContext('2d');
+const _turtleCtx = (() => {
+   const turtleCanv = /**@type {HTMLCanvasElement}*/(document.getElementById('turtlecanvas'));
+   return /**@type {CanvasRenderingContext2D}*/(turtleCanv.getContext('2d'));
+})();
 
 // the turtle takes precedence when compositing
 _turtleCtx.globalCompositeOperation = 'destination-over';
@@ -32,7 +45,7 @@ _turtleCtx.globalCompositeOperation = 'destination-over';
  * as lists of [x,y] pairs.
  * (The shapes are borrowed from cpython turtle.py)
  */
-const _shapes = {
+const _shapes = Object.freeze(/**@type {const}*/({
    triangle: [[-5, 0], [5, 0], [0, 15]],
    turtle: [
       [0, 16], [-2, 14], [-1, 10], [-4, 7], [-7, 9],
@@ -51,7 +64,7 @@ const _shapes = {
       [-0.00, -10.00], [3.09, -9.51], [5.88, -8.09],
       [8.09, -5.88], [9.51, -3.09]
    ]
-};
+}));
 
 const _DEFAULT_SHAPE = 'triangle';
 
@@ -111,22 +124,20 @@ const draw = () => {
       _turtleCtx.translate(-x, -y);
 
       /**
-       * the type isn't guaranteed, because `shapes` isn't `freeze`d nor `seal`ed,
+       * the type isn't guaranteed, because {@link _shapes} is fully mutable,
        * so the user may mutate it
        * @type {number[][]}
       */
-      const icon = _shapes[
+      const shape = _shapes[
          // eslint-disable-next-line no-prototype-builtins
          _shapes.hasOwnProperty(_turtle.shape) ? _turtle.shape : _DEFAULT_SHAPE
       ];
-      const iconLen = icon.length;
 
       // draw the turtle icon
       _turtleCtx.beginPath();
-      if (iconLen > 0)
-         _turtleCtx.moveTo(x + icon[0][0], y + icon[0][1]);
-      for (let i=1; i < iconLen; i++) {
-         const [cx, cy] = icon[i];
+      if (shape.length > 0)
+         _turtleCtx.moveTo(x + shape[0][0], y + shape[0][1]);
+      for (const [cx, cy] of shape.slice(1)) {
          _turtleCtx.lineTo(x + cx, y + cy);
       }
       _turtleCtx.closePath();
@@ -181,14 +192,15 @@ const forward = distance => {
 
    // get the boundaries of the canvas
    const
+      {abs, sin, cos} = Math,
       {width: w, height: h} = _imageCanvas,
       maxX = w / 2, minX = -maxX,
-      maxY = h / 2, minY = -maxY,
-      {abs, sin, cos} = Math;
+      maxY = h / 2, minY = -maxY;
 
    /**
     * Returns the sine and cosine of a number, as a 2-tuple.
     * @param {number} x
+    * @return {[number, number]}
     */
    const sin_cos = x => [sin(x), cos(x)];
 
@@ -292,7 +304,7 @@ const pendown = () => { _turtle.penDown = true; };
  * @param {number} angle
  */
 const right = angle => {
-   _turtle.angle += _degToRad(angle);
+   _turtle.angle += degToRad(angle);
    drawIf();
 };
 
@@ -301,7 +313,7 @@ const right = angle => {
  * @param {number} angle
  */
 const left = angle => {
-   _turtle.angle -= _degToRad(angle);
+   _turtle.angle -= degToRad(angle);
    drawIf();
 };
 
@@ -320,19 +332,19 @@ const goto = (x, y) => {
  * set the angle of the turtle in degrees
  * @param {number} a
  */
-const angle = a => { _turtle.angle = _degToRad(a); };
+const angle = a => { _turtle.angle = degToRad(a); };
 
 /**
  * convert degrees to radians
  * @param {number} deg
  */
-const _degToRad = deg => deg / 180 * Math.PI;
+const degToRad = deg => deg / 180 * Math.PI;
 
 /**
  * convert radians to degrees
  * @param {number} rad
  */
-const _radToDeg = rad => rad * 180 / Math.PI;
+const radToDeg = rad => rad * 180 / Math.PI;
 
 /**
  * set the width of the line
@@ -351,7 +363,7 @@ const width = w => {
  * the turtle orientation, but this will require some clever
  * canvas transformations which aren't implemented yet.
  * @param {string} msg
- * @param {string} font
+ * @param {string} [font]
  */
 const write = (msg, font) => {
    const {x, y} = _turtle.pos;
@@ -363,12 +375,23 @@ const write = (msg, font) => {
    _imageCtx.translate(x, y);
    _imageCtx.transform(1, 0, 0, -1, 0, 0);
    _imageCtx.translate(-x, -y);
-   _imageCtx.font = font;
+
+   const prevFont = _imageCtx.font;
+   if (font !== undefined)
+      _imageCtx.font = font;
    _imageCtx.fillText(msg, x, y);
+   _imageCtx.font = prevFont;
+
    _imageCtx.restore();
 
    drawIf();
 };
+
+/**
+ * set the font of the image Context
+ * @param {string} font
+ */
+const setFont = font => { _imageCtx.font = font; };
 
 /**
  * set the turtle draw shape
@@ -418,7 +441,7 @@ const random = (min, max) => {
 /**
  * repeatedly run an "action" callback `n` times
  * @param {number} n integer
- * @param {() => *} action callback
+ * @param {() => never} action callback
  */
 const repeat = (n, action) => { while (n-- > 0) action(); };
 
@@ -511,7 +534,7 @@ const _main = () => {
          // flush old entries
          while (this._size > this._maxSize) {
             // dequeue, then update size
-            this._size -= this._entries.shift().length;
+            this._size -= /**@type {string}*/(this._entries.shift()).length;
             this._index--; // index correction
          }
       }
@@ -547,8 +570,7 @@ const _main = () => {
 
    const cmds = new Hist(1 << 20); // is this size "balanced"?
 
-   /**@type {HTMLInputElement}*/
-   const cmdBox = doc.getElementById('command');
+   const cmdBox = /**@type {HTMLInputElement}*/(doc.getElementById('command'));
 
    cmdBox.addEventListener('keydown', ({ key }) => {
       switch (key) {
@@ -563,8 +585,7 @@ const _main = () => {
       cmdBox.value = cmds.get();
    }, false);
 
-   /**@type {HTMLTextAreaElement}*/
-   const def = doc.getElementById('definitions');
+   const def = /**@type {HTMLTextAreaElement}*/(doc.getElementById('definitions'));
 
    /** Executes program in the command box */
    const runCmd = () => {
@@ -591,7 +612,7 @@ const _main = () => {
    /**
     * Similar to JQuery
     * @param {string} id HTML element ID
-    * @param {(this: HTMLElement, ev: MouseEvent) => any} cb callback
+    * @param {(this: HTMLElement, ev: MouseEvent) => unknown} cb callback
     */
    const listenClickById = (id, cb) => doc.getElementById(id).addEventListener('click', cb);
    // call `runCmd` when user presses "Run"

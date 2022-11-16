@@ -38,7 +38,7 @@ function circle(x, y, w, radius, sides) {
 function numbers(x, y, radius) {
    penup();
    setFont('20px sans-serif');
-   for (let hour = 1; hour <= 12; hour++) {
+   for (const hour of range(1, 13)) {
       goto(x,y);
       angle(hour * 30);
       forward(radius);
@@ -66,12 +66,14 @@ function hands(hours, minutes, seconds) {
    // draw seconds hand
    hand(seconds * 6, 6, 100, {r: 255, g: 0, b: 0, a: 0.5 });
    // draw minutes hand
-   const minutesInSeconds = minutes * 60;
-   const minutesAndSeconds = minutesInSeconds + seconds;
+   const
+      minutesInSeconds = minutes * 60,
+      minutesAndSeconds = minutesInSeconds + seconds;
    hand(minutesAndSeconds * 0.1, 10, 100, {r: 0, g: 255, b: 0, a: 0.5 });
    // draw hours hand
-   const hoursInSeconds = hours % 12 * 3600;
-   const hoursAndMinutesAndSeconds = hoursInSeconds + minutesAndSeconds;
+   const
+      hoursInSeconds = hours % 12 * 3600,
+      hoursAndMinutesAndSeconds = hoursInSeconds + minutesAndSeconds;
    hand(hoursAndMinutesAndSeconds * 360 / 43200, 10, 60, {r: 0, g: 0, b: 255, a: 0.5 });
 }
 
