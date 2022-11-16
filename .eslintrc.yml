@@ -1,7 +1,17 @@
 env:
   browser: true
   es6: true # retro-compatibility
+
 extends: eslint:recommended
+
+# eslint refuses to work if this is uncommented
+# it seems the formatting is wrong
+#overrides:
+#- files:
+#  - /examples/
+#  rules:
+#    no-undef: off
+
 rules: # `warn`` instead of `error`, for easier transition
   indent:
     - warn
