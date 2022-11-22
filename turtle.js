@@ -1,14 +1,11 @@
 'use strict';
 /**
  * @typedef {number} Uint32
- * An integer in the range 0 <= n < 2^32.
- * AKA unsigned (non-negative) 32bit int.
- *
- * Name influenced by {@link Uint32Array}.
+ * Name influenced by {@link Uint32Array}
  */
 
 /**
- * Yield a sequence of ints in the interval `[start, end(`.
+ * Yield a sequence of numbers in the interval `[start, end(`.
  * Doesn't handle unsafe (overflowing) numbers, so it'll get stuck at {@link Number.MAX_SAFE_INTEGER}.
  * @param {number} start
  * @param {number} end
