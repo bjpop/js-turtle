@@ -65,7 +65,7 @@ const _shapes = Object.freeze(/**@type {const}*/({
 
 const _DEFAULT_SHAPE = 'triangle';
 
-/** turtle-object constructor. For better "IntelliSense" and less code duplication */
+/** turtle-object constructor, for static type-checking */
 const _defaultTurtle = () => ({
    pos: {
       x: 0,
