@@ -360,9 +360,8 @@ const width = w => {
  * the turtle orientation, but this will require some clever
  * canvas transformations which aren't implemented yet.
  * @param {string} msg
- * @param {string} [font]
  */
-const write = (msg, font) => {
+const write = msg => {
    const {x, y} = _turtle.pos;
 
    _imageCtx.save();
@@ -373,11 +372,7 @@ const write = (msg, font) => {
    _imageCtx.transform(1, 0, 0, -1, 0, 0);
    _imageCtx.translate(-x, -y);
 
-   const prevFont = _imageCtx.font;
-   if (font !== undefined)
-      _imageCtx.font = font;
    _imageCtx.fillText(msg, x, y);
-   _imageCtx.font = prevFont;
 
    _imageCtx.restore();
 
