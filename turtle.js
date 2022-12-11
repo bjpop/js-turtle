@@ -518,7 +518,7 @@ const _main = () => {
        * @param {string} s
        */
       set(s) {
-         // queue, then set index to newest entry
+         // enqueue, then set index to newest entry
          this._index = this._entries.push(s);
          // ensure it's up-to-date, to avoid memory leaks
          this._size += s.length;
