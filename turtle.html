@@ -1,14 +1,15 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 <html>
    <head>
       <title>Javascript Turtle</title>
       <link type="text/css" rel="stylesheet" href="turtle.css" />
+      <meta name="color-scheme" content="light dark" />
    </head>
    <body>
       <div id="wrap">
          <h1>Javascript Turtle Graphics</h1>
          <div id="leftcolumn">
-            <h4>Language Reference</h4>
+            <h4>Language API Reference</h4>
             <code>
               forward(distance) <br/>
               right(angle) <br/>
@@ -19,10 +20,13 @@
               pendown() <br/>
               reset() <br/>
               angle(angle) <br/>
+              degToRad(angle) <br/>
+              radToDeg(angle) <br/>
               width(width) <br/>
-              shape(shape) <br />
+              shape(shape) <br/>
               colour(r,g,b,a) <br/>
-              write(string) <br/>
+              color(r,g,b,a) <br/>
+              write(msg) <br/>
               n = random(low,high) <br/>
               hideTurtle() <br/>
               showTurtle() <br/>
@@ -31,6 +35,7 @@
               repeat(n, action) <br/>
               wrap(bool) <br/>
               animate(action,ms) <br/>
+              range(start, end, step=1) <br/>
             </code>
          </div> <!-- leftcolumn -->
          <div id="midcolumn">
@@ -38,9 +43,10 @@
             <canvas id="turtlecanvas" width="300" height="300"></canvas>
             <canvas id="imagecanvas" width="300" height="300" style="display:none"></canvas>
             <h4>Command</h4>
-               <input type="text" id="command" />
-	    <br/>
-	    <button id="resetButton">Reset</button>
+               <input type="text" id="command" placeholder="use arrow keys to navigate history" autocapitalize="off"/>
+      <br/>
+      <button id="runButton">Run</button>
+      <button id="resetButton">Reset</button>
 
          </div> <!-- midcolumn -->
          <div id="rightcolumn">

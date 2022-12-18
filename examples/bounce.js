@@ -1,58 +1,39 @@
-// rectagles which bounce off the side of the canvas
-function init_drops(n) {
-   var drops = new Array(n);
-   for (var i = 0; i < n; i++) {
-      var x = random(-150, 150);
-      var y = random(-150, 150);
-      var velocityX = random(-6,6);
-      var velocityY = random(-6,6);
-      var size = random(20,300);
-      var width = random(1,40);
-      var a = Math.random();
-      var r = random(0,255);
-      var g = random(0,255);
-      var b = random(0,255);
-      drops[i] = {
-         x: x, y: y,
-         velocityX: velocityX,
-         velocityY: velocityY,
-         size: size,
-         r:r, g:g, b: b,
-         width: width,
-         a: a
-      };
-   }
-   return drops;
-}
+// rectangles which bounce off the side of the canvas
 
-function rain (drops, n) {
+const init_drops = length => Array.from({ length }, () => ({
+   x: random(-150, 150),
+   y: random(-150, 150),
+
+   velocityX: random(-6, 6),
+   velocityY: random(-6, 6),
+
+   size: random(20, 300),
+   width: random(1, 40),
+
+   r: random(0, 255),
+   g: random(0, 255),
+   b: random(0, 255),
+   a: Math.random()
+}));
+
+function rain(drops) {
    clear();
-   for (var i = 0; i < n; i++) {
-      var d = drops[i];
+   for (const d of drops) {
       colour(d.r,d.g,d.b,d.a);
       width(d.width);
-      goto(d.x, d.y);
-      if (d.y < -150) {
-         d.velocityY = -d.velocityY;
-      }
-      else if (d.y + d.size > 150 && d.velocityY > 0) {
-         d.velocityY = -d.velocityY;
-      }
-      if (d.x - d.width/2 < -150) {
-         d.velocityX = -d.velocityX;
-      }
-      else if (d.x + d.width/2 > 150) {
-         d.velocityX = -d.velocityX;
-      }
+      goto(d.x,d.y);
+      if (d.y < -150 || d.y + d.size > 150 && d.velocityY > 0)
+         d.velocityY *= -1;
+      if (d.x - d.width/2 < -150 || d.x + d.width/2 > 150)
+         d.velocityX *= -1;
       forward(d.size);
       d.y += d.velocityY;
       d.x += d.velocityX;
    }
 }
 
-function demo (n) {
+function demo(n) {
    wrap(false);
    hideTurtle();
-   drops = init_drops(n);
-   animate(function () { rain(drops, n)}, 100);
+   animate(() => rain(init_drops(n)), 100);
 }

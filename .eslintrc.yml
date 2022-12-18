@@ -1,0 +1,39 @@
+env:
+  browser: true
+  es6: true # retro-compatibility
+
+extends: eslint:recommended
+
+# eslint refuses to work if this is uncommented
+# it seems the formatting is wrong
+#overrides:
+#- files:
+#  - /examples/
+#  rules:
+#    no-undef: off
+
+rules: # `warn`` instead of `error`, for easier transition
+  indent:
+    - warn
+    - 3 # average between 2 and 4
+    - SwitchCase: 1
+  linebreak-style:
+    - warn
+    - unix # reason: less bytes
+  quotes:
+    - warn
+    - single # reason: it seems these are used more frequently in *.js files
+  semi:
+    - warn
+    - always
+  no-self-compare: error
+  no-constant-binary-expression: error
+  no-unreachable-loop: error
+  no-unused-vars:
+    - warn
+    - vars: local
+  no-unused-private-class-members: warn
+  no-shadow:
+    - warn
+    - builtinGlobals: true
+  no-constructor-return: warn
